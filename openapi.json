@@ -1,0 +1,1115 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "GetYourGuide API",
+    "version": "2026-11-20",
+    "description": "Tour & activity listings from GetYourGuide — prices, ratings, availability dates and destinations, plus per-activity detail and bulk sitemap discovery.\n\nEvery request needs an API key in the `Authorization: Bearer <key>` header. Create one at https://maviapi.com/dashboard/keys. A successful request uses one credit, unless its operation says more (`x-credits`). That price covers 200 rows (or the operation's `x-credits-rows`); a request that returns more pays it again for each further page of that many rows. The `x-maviapi-credits` response header says what a request cost.\n\nEndpoint reference with live examples: https://maviapi.com/apis/getyourguide",
+    "termsOfService": "https://maviapi.com/terms"
+  },
+  "externalDocs": {
+    "description": "API page",
+    "url": "https://maviapi.com/apis/getyourguide"
+  },
+  "servers": [
+    {
+      "url": "https://api.maviapi.com/v1/sites/getyourguide"
+    }
+  ],
+  "security": [
+    {
+      "maviapiKey": []
+    }
+  ],
+  "paths": {
+    "/activities/{location}": {
+      "get": {
+        "operationId": "activitiesLocation",
+        "summary": "Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each with price, rating, next availability date and destination.",
+        "description": "Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each with price, rating, next availability date and destination.\n\nEach successful request uses 25 credits.",
+        "x-credits": 25,
+        "parameters": [
+          {
+            "name": "location",
+            "in": "path",
+            "required": true,
+            "description": "GetYourGuide place slug in the {city}-l{id} form (from /catalog or an activity URL).",
+            "schema": {
+              "type": "string"
+            },
+            "example": "venice-l35"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Max items per page (default 50, max 200).",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            },
+            "example": 50
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Items to skip for pagination.",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The data, as JSON.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "location": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "venice-l35"
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 16
+                        },
+                        "activities": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "927092"
+                              },
+                              "title": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Venice: St. Mark's Basilica, Doge's Palace & Bridge of Sighs"
+                              },
+                              "url": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "https://www.getyourguide.com/venice-l35/venice-st-mark-s-basilica-doge-s-palace-bridge-of-sighs-t927092/"
+                              },
+                              "price": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 41.76
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "EUR"
+                              },
+                              "rating": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 4.0319786
+                              },
+                              "rating_count": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ],
+                                "example": 4122
+                              },
+                              "available_from": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Next availability datetime (ISO 8601)",
+                                "example": "2026-08-14T09:00:00+02:00"
+                              },
+                              "location": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Venice"
+                              },
+                              "image": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "https://cdn.getyourguide.com/img/tour/....jpg/68.jpg"
+                              },
+                              "position": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ],
+                                "example": 1
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "cached": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ],
+                      "example": false
+                    },
+                    "source": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "example": "https://www.getyourguide.com/venice-l35/"
+                    },
+                    "pagination": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "total": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 16
+                        },
+                        "limit": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 50
+                        },
+                        "offset": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 0
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 16
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "402": {
+            "$ref": "#/components/responses/CreditLimitReached"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccountSuspended"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamFailed"
+          }
+        }
+      }
+    },
+    "/activity/{id}": {
+      "get": {
+        "operationId": "activityId",
+        "summary": "Full detail for one activity by numeric id (e.g. 6851): title, description, images, price, rating, review count and sample reviews.",
+        "description": "Full detail for one activity by numeric id (e.g. 6851): title, description, images, price, rating, review count and sample reviews.\n\nEach successful request uses 25 credits.",
+        "x-credits": 25,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Numeric activity id (the …-t<id> in an activity URL).",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6851"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The data, as JSON.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "6851"
+                        },
+                        "title": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "Venice: Grand Canal Boat Tour"
+                        },
+                        "description": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "Enjoy a boat tour on the Grand Canal of Venice..."
+                        },
+                        "images": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": [
+                            "https://cdn.getyourguide.com/img/tour/....jpg/53.jpg"
+                          ]
+                        },
+                        "price": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "example": 45
+                        },
+                        "currency": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "EUR"
+                        },
+                        "rating": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "example": 4.176025694659586
+                        },
+                        "review_count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 1100
+                        },
+                        "reviews": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "author": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "James"
+                              },
+                              "rating": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 5
+                              },
+                              "title": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": null
+                              },
+                              "text": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Our guide was brilliant and answered any questions put to her. Well worth it."
+                              },
+                              "date": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "2026-08-11T05:28:12+02:00"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "cached": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ],
+                      "example": false
+                    },
+                    "source": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "example": "https://www.getyourguide.com/x-l0/x-t6851/"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "402": {
+            "$ref": "#/components/responses/CreditLimitReached"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccountSuspended"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamFailed"
+          }
+        }
+      }
+    },
+    "/catalog": {
+      "get": {
+        "operationId": "catalog",
+        "summary": "Enumerate all activity URLs from a GetYourGuide activity sitemap file (?index, ~5000 each); each entry has the activity id and location slug.",
+        "description": "Enumerate all activity URLs from a GetYourGuide activity sitemap file (?index, ~5000 each); each entry has the activity id and location slug.",
+        "x-credits": 1,
+        "parameters": [
+          {
+            "name": "index",
+            "in": "query",
+            "required": false,
+            "description": "Which activity sitemap file to read (0-based).",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Max items per page (default 100, max 5000).",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Items to skip for pagination.",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The data, as JSON.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "index": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 0
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 100
+                        },
+                        "activities": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "4873"
+                              },
+                              "url": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "https://www.getyourguide.com/geneva-l54/best-of-geneva-guided-city-tour-with-scenic-lake-cruise-t4873/"
+                              },
+                              "location": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "geneva-l54"
+                              },
+                              "location_id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "54"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "cached": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ],
+                      "example": false
+                    },
+                    "source": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "example": "getyourguide:sitemap"
+                    },
+                    "pagination": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "total": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 5000
+                        },
+                        "limit": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 50
+                        },
+                        "offset": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 0
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 16
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "402": {
+            "$ref": "#/components/responses/CreditLimitReached"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccountSuspended"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamFailed"
+          }
+        }
+      }
+    },
+    "/explore": {
+      "get": {
+        "operationId": "explore",
+        "summary": "Resolve a location's tour/activity listings and optionally enrich the top N with full detail (description, images, reviews) in one call.",
+        "description": "Resolve a location's tour/activity listings and optionally enrich the top N with full detail (description, images, reviews) in one call.\n\nEach successful request uses 25 credits.",
+        "x-credits": 25,
+        "parameters": [
+          {
+            "name": "location",
+            "in": "query",
+            "required": true,
+            "description": "GetYourGuide place slug, e.g. venice-l35.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "venice-l35"
+          },
+          {
+            "name": "detail",
+            "in": "query",
+            "required": false,
+            "description": "When true, enrich the top `enrich` listings with detail (description, images, reviews).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "false"
+            },
+            "example": "true"
+          },
+          {
+            "name": "enrich",
+            "in": "query",
+            "required": false,
+            "description": "How many top listings to enrich when detail=true (1-5).",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "default": 3
+            },
+            "example": 3
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Max items per page (default 50, max 200).",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            },
+            "example": 50
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Items to skip for pagination.",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The data, as JSON.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "location": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "venice-l35"
+                        },
+                        "detail": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": true
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 16
+                        },
+                        "activities": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "927092"
+                              },
+                              "title": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Venice: St. Mark's Basilica, Doge's Palace & Bridge of Sighs"
+                              },
+                              "url": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "https://www.getyourguide.com/venice-l35/venice-st-mark-s-basilica-doge-s-palace-bridge-of-sighs-t927092/"
+                              },
+                              "price": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 41.76
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "EUR"
+                              },
+                              "rating": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 4.0319786
+                              },
+                              "rating_count": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ],
+                                "example": 4122
+                              },
+                              "available_from": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Next availability datetime (ISO 8601)",
+                                "example": "2026-08-14T09:00:00+02:00"
+                              },
+                              "location": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Venice"
+                              },
+                              "image": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "https://cdn.getyourguide.com/img/tour/....jpg/68.jpg"
+                              },
+                              "position": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ],
+                                "example": 1
+                              },
+                              "detail": {
+                                "type": [
+                                  "object",
+                                  "null"
+                                ],
+                                "description": "Present when detail=true (top N only); null on a per-item enrichment failure.",
+                                "properties": {
+                                  "description": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ]
+                                  },
+                                  "images": {
+                                    "type": [
+                                      "array",
+                                      "null"
+                                    ],
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "reviews": {
+                                    "type": [
+                                      "array",
+                                      "null"
+                                    ],
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "author": {
+                                          "type": [
+                                            "string",
+                                            "null"
+                                          ],
+                                          "example": "James"
+                                        },
+                                        "rating": {
+                                          "type": [
+                                            "number",
+                                            "null"
+                                          ],
+                                          "example": 5
+                                        },
+                                        "title": {
+                                          "type": [
+                                            "string",
+                                            "null"
+                                          ],
+                                          "example": null
+                                        },
+                                        "text": {
+                                          "type": [
+                                            "string",
+                                            "null"
+                                          ],
+                                          "example": "Our guide was brilliant and answered any questions put to her. Well worth it."
+                                        },
+                                        "date": {
+                                          "type": [
+                                            "string",
+                                            "null"
+                                          ],
+                                          "example": "2026-08-11T05:28:12+02:00"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "cached": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ],
+                      "example": false
+                    },
+                    "source": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "example": "getyourguide:combo"
+                    },
+                    "pagination": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "total": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 16
+                        },
+                        "limit": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 50
+                        },
+                        "offset": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 0
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 16
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "402": {
+            "$ref": "#/components/responses/CreditLimitReached"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccountSuspended"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamFailed"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "maviapiKey": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Your maviapi API key, sent as `Authorization: Bearer <key>`. Create one at https://maviapi.com/dashboard/keys."
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": [
+          "error",
+          "message"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Machine-readable code, e.g. `rate_limited`."
+          },
+          "message": {
+            "type": "string",
+            "description": "What went wrong, in a sentence."
+          }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "A parameter is missing or cannot be used.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": "bad_request",
+              "message": "Missing required query parameter: q"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "No API key was sent, or the key is invalid or revoked (`missing_api_key`, `invalid_api_key`).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": "missing_api_key",
+              "message": "Provide an API key via the Authorization: Bearer <key> header."
+            }
+          }
+        }
+      },
+      "CreditLimitReached": {
+        "description": "The plan's credits for this period are used up.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": "credit_limit_reached",
+              "message": "You've used all 5,000 credits in your Trial plan for this period. Upgrade your plan for a higher allotment."
+            }
+          }
+        }
+      },
+      "AccountSuspended": {
+        "description": "The account that owns the key is suspended.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": "account_banned",
+              "message": "Your account is suspended."
+            }
+          }
+        }
+      },
+      "RateLimited": {
+        "description": "Too many requests for this key. Wait the number of seconds in `Retry-After`.",
+        "headers": {
+          "Retry-After": {
+            "description": "Seconds to wait before retrying.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": "rate_limited",
+              "message": "Rate limit exceeded for this API key."
+            }
+          }
+        }
+      },
+      "UpstreamFailed": {
+        "description": "The source site could not be read this time. Retrying later usually works.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": "scrape_failed",
+              "message": "The upstream source could not be fetched"
+            }
+          }
+        }
+      }
+    }
+  }
+}

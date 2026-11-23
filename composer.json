@@ -1,0 +1,24 @@
+{
+  "name": "maviapi-sdks/getyourguide-unofficial-sdk",
+  "description": "Unofficial GetYourGuide API client",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "getyourguide",
+    "getyourguide-api",
+    "unofficial",
+    "sdk",
+    "maviapi"
+  ],
+  "homepage": "https://maviapi.com/apis/getyourguide",
+  "require": {
+    "php": ">=8.1",
+    "ext-curl": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "classmap": [
+      "php/"
+    ]
+  }
+}

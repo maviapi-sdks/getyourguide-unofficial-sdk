@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "getyourguide-unofficial-sdk"
+version = "0.1.0"
+description = "Unofficial GetYourGuide API client"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["getyourguide", "getyourguide-api", "unofficial", "sdk", "maviapi"]
+
+[project.urls]
+Homepage = "https://maviapi.com/apis/getyourguide"
+Repository = "https://github.com/maviapi-sdks/getyourguide-unofficial-sdk"
+
+[tool.setuptools]
+packages = ["getyourguide_sdk"]
