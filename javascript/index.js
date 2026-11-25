@@ -29,10 +29,22 @@ export class GetyourguideClient {
   }
 
   /**
+   * Every tour & activity GetYourGuide lists for a location slug (e.g. venice-l35), all
+   * pages: price, rating, review count, duration, next availability, image.
+   * pagination.total matches the site's own count.
+   *
+   * Each successful request uses 10 credits for every 24 rows it returns (at least 10
+   * credits).
+   */
+  activitiesV2Location(params) {
+    return this.request("/activities-v2/{location}", params, ["location"]);
+  }
+
+  /**
    * Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each
    * with price, rating, next availability date and destination.
    *
-   * Each successful request uses 25 credits.
+   * Each successful request uses 10 credits.
    */
   activitiesLocation(params) {
     return this.request("/activities/{location}", params, ["location"]);
@@ -42,7 +54,7 @@ export class GetyourguideClient {
    * Full detail for one activity by numeric id (e.g. 6851): title, description, images,
    * price, rating, review count and sample reviews.
    *
-   * Each successful request uses 25 credits.
+   * Each successful request uses 10 credits.
    */
   activityId(params) {
     return this.request("/activity/{id}", params, ["id"]);
@@ -51,6 +63,9 @@ export class GetyourguideClient {
   /**
    * Enumerate all activity URLs from a GetYourGuide activity sitemap file (?index, ~5000
    * each); each entry has the activity id and location slug.
+   *
+   * Each successful request uses 1 credit for every 5000 rows it returns (at least 1
+   * credit).
    */
   catalog(params = {}) {
     return this.request("/catalog", params, []);
@@ -60,10 +75,46 @@ export class GetyourguideClient {
    * Resolve a location's tour/activity listings and optionally enrich the top N with
    * full detail (description, images, reviews) in one call.
    *
-   * Each successful request uses 25 credits.
+   * Each successful request uses 10 credits.
    */
   explore(params) {
     return this.request("/explore", params, ["location"]);
+  }
+
+  /**
+   * Every tour/activity GetYourGuide lists for a location (all pages, pagination.total =
+   * the site's count), optionally with full detail (description, images, reviews) for
+   * the top N, in one call.
+   *
+   * Each successful request uses 10 credits for every 24 rows it returns (at least 10
+   * credits).
+   */
+  exploreV2(params) {
+    return this.request("/explore-v2", params, ["location"]);
+  }
+
+  /**
+   * Find GetYourGuide places (cities, regions, countries, attractions) by name: id,
+   * name, type, descriptor (e.g. 'City in Italy') and the place slug (e.g. venice-l35)
+   * that /activities, /activities-v2, /explore and /search take.
+   *
+   * Each successful request uses 10 credits.
+   */
+  locations(params) {
+    return this.request("/locations", params, ["q"]);
+  }
+
+  /**
+   * Search GetYourGuide tours & activities by free text and/or place, with the site's
+   * filters (dates, price range, duration, minimum rating, languages, start time,
+   * features, categories, departure place) and sort orders. 24 results per page;
+   * data.total is the site's own count.
+   *
+   * Each successful request uses 10 credits for every 24 rows it returns (at least 10
+   * credits).
+   */
+  search(params = {}) {
+    return this.request("/search", params, []);
   }
 
   /** GET one endpoint path. Parameters named in the path go there, the rest in the query. */

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "GetYourGuide API",
-    "version": "2026-11-20",
+    "version": "2026-11-25",
     "description": "Tour & activity listings from GetYourGuide — prices, ratings, availability dates and destinations, plus per-activity detail and bulk sitemap discovery.\n\nEvery request needs an API key in the `Authorization: Bearer <key>` header. Create one at https://maviapi.com/dashboard/keys. A successful request uses one credit, unless its operation says more (`x-credits`). That price covers 200 rows (or the operation's `x-credits-rows`); a request that returns more pays it again for each further page of that many rows. The `x-maviapi-credits` response header says what a request cost.\n\nEndpoint reference with live examples: https://maviapi.com/apis/getyourguide",
     "termsOfService": "https://maviapi.com/terms"
   },
@@ -21,12 +21,335 @@
     }
   ],
   "paths": {
+    "/activities-v2/{location}": {
+      "get": {
+        "operationId": "activitiesV2Location",
+        "summary": "All activities for a location (every page)",
+        "description": "Every tour & activity GetYourGuide lists for a location slug (e.g. venice-l35), all pages: price, rating, review count, duration, next availability, image. pagination.total matches the site's own count.\n\nEach successful request uses 10 credits for every 24 rows it returns (at least 10 credits).",
+        "x-credits": 10,
+        "x-credits-rows": 24,
+        "parameters": [
+          {
+            "name": "location",
+            "in": "path",
+            "required": true,
+            "description": "GetYourGuide place slug in the {city}-l{id} form (from /catalog or an activity URL).",
+            "schema": {
+              "type": "string"
+            },
+            "example": "venice-l35"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Max activities per page (default 50, max 1000). Every page of the location is fetched once and cached, so any limit/offset is served from the same full list.",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            },
+            "example": 50
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Activities to skip. Works up to pagination.total (the site's full count), not just the first page.",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The data, as JSON.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "location": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "venice-l35"
+                        },
+                        "location_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "35"
+                        },
+                        "total": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 1152,
+                          "description": "The site's own count of activities for the location"
+                        },
+                        "complete": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": true,
+                          "description": "True when every activity the site counts was collected (false only if a very large location ran out of time; the list is then a subset)"
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 50,
+                          "description": "Activities in this page"
+                        },
+                        "activities": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "6849",
+                                "description": "Activity id (the -t<id> in its URL)"
+                              },
+                              "title": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Venice: Marco Polo Airport Water Taxi Transfer"
+                              },
+                              "abstract": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Make your arrival in Venice unforgettable with a water taxi transfer to your hotel or the nearest accessible point from Venice Airport.",
+                                "description": "Short summary shown on the listing card"
+                              },
+                              "url": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "https://www.getyourguide.com/venice-l35/venice-marco-polo-airport-transfer-shared-water-taxi-t6849/"
+                              },
+                              "price": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 39,
+                                "description": "Starting price (after any discount)"
+                              },
+                              "original_price": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 39,
+                                "description": "Price before discount"
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "EUR"
+                              },
+                              "price_label": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "per person",
+                                "description": "What the price covers, e.g. per person or per group"
+                              },
+                              "rating": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 4.37,
+                                "description": "Average rating (0-5)"
+                              },
+                              "rating_count": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ],
+                                "example": 29055,
+                                "description": "Number of reviews"
+                              },
+                              "category": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "transfer",
+                                "description": "Activity type, e.g. guidedTour, ticket, transfer"
+                              },
+                              "duration": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "50 minutes",
+                                "description": "Duration label as shown by the site"
+                              },
+                              "free_cancellation": {
+                                "type": [
+                                  "boolean",
+                                  "null"
+                                ],
+                                "example": true,
+                                "description": "Free cancellation offered"
+                              },
+                              "available_from": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "2026-11-14T13:30:00+01:00",
+                                "description": "Next availability datetime (ISO 8601)"
+                              },
+                              "location": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Venice",
+                                "description": "Place label shown on the card"
+                              },
+                              "image": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=270,height=180,dpr=2/tour_img/1b7db2e061cdbe72.jpeg",
+                                "description": "Card image URL"
+                              },
+                              "position": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ],
+                                "example": 1,
+                                "description": "1-based rank: the site's popularity order first, then the remaining activities by ascending price"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "cached": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ],
+                      "example": false
+                    },
+                    "source": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "example": "getyourguide:search"
+                    },
+                    "pagination": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "total": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 1152,
+                          "description": "Equals data.total (the site's own count) when data.complete is true"
+                        },
+                        "limit": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 50
+                        },
+                        "offset": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 0
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 50
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "402": {
+            "$ref": "#/components/responses/CreditLimitReached"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccountSuspended"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamFailed"
+          }
+        }
+      }
+    },
     "/activities/{location}": {
       "get": {
         "operationId": "activitiesLocation",
         "summary": "Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each with price, rating, next availability date and destination.",
-        "description": "Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each with price, rating, next availability date and destination.\n\nEach successful request uses 25 credits.",
-        "x-credits": 25,
+        "description": "Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each with price, rating, next availability date and destination.\n\nEach successful request uses 10 credits.",
+        "x-credits": 10,
         "parameters": [
           {
             "name": "location",
@@ -267,8 +590,8 @@
       "get": {
         "operationId": "activityId",
         "summary": "Full detail for one activity by numeric id (e.g. 6851): title, description, images, price, rating, review count and sample reviews.",
-        "description": "Full detail for one activity by numeric id (e.g. 6851): title, description, images, price, rating, review count and sample reviews.\n\nEach successful request uses 25 credits.",
-        "x-credits": 25,
+        "description": "Full detail for one activity by numeric id (e.g. 6851): title, description, images, price, rating, review count and sample reviews.\n\nEach successful request uses 10 credits.",
+        "x-credits": 10,
         "parameters": [
           {
             "name": "id",
@@ -448,8 +771,9 @@
       "get": {
         "operationId": "catalog",
         "summary": "Enumerate all activity URLs from a GetYourGuide activity sitemap file (?index, ~5000 each); each entry has the activity id and location slug.",
-        "description": "Enumerate all activity URLs from a GetYourGuide activity sitemap file (?index, ~5000 each); each entry has the activity id and location slug.",
+        "description": "Enumerate all activity URLs from a GetYourGuide activity sitemap file (?index, ~5000 each); each entry has the activity id and location slug.\n\nEach successful request uses 1 credit for every 5000 rows it returns (at least 1 credit).",
         "x-credits": 1,
+        "x-credits-rows": 5000,
         "parameters": [
           {
             "name": "index",
@@ -641,8 +965,8 @@
       "get": {
         "operationId": "explore",
         "summary": "Resolve a location's tour/activity listings and optionally enrich the top N with full detail (description, images, reviews) in one call.",
-        "description": "Resolve a location's tour/activity listings and optionally enrich the top N with full detail (description, images, reviews) in one call.\n\nEach successful request uses 25 credits.",
-        "x-credits": 25,
+        "description": "Resolve a location's tour/activity listings and optionally enrich the top N with full detail (description, images, reviews) in one call.\n\nEach successful request uses 10 credits.",
+        "x-credits": 10,
         "parameters": [
           {
             "name": "location",
@@ -988,6 +1312,1273 @@
           }
         }
       }
+    },
+    "/explore-v2": {
+      "get": {
+        "operationId": "exploreV2",
+        "summary": "Explore a location: every activity, optional detail for the top N",
+        "description": "Every tour/activity GetYourGuide lists for a location (all pages, pagination.total = the site's count), optionally with full detail (description, images, reviews) for the top N, in one call.\n\nEach successful request uses 10 credits for every 24 rows it returns (at least 10 credits).",
+        "x-credits": 10,
+        "x-credits-rows": 24,
+        "parameters": [
+          {
+            "name": "location",
+            "in": "query",
+            "required": true,
+            "description": "GetYourGuide place slug, e.g. venice-l35.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "venice-l35"
+          },
+          {
+            "name": "detail",
+            "in": "query",
+            "required": false,
+            "description": "When true, enrich the top `enrich` activities with detail (description, images, reviews).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "false"
+            },
+            "example": "false"
+          },
+          {
+            "name": "enrich",
+            "in": "query",
+            "required": false,
+            "description": "How many top activities to enrich when detail=true (1-5).",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "default": 3
+            },
+            "example": 3
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Max activities per page (default 50, max 1000). Every page of the location is fetched once and cached, so any limit/offset is served from the same full list.",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            },
+            "example": 50
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Activities to skip. Works up to pagination.total (the site's full count), not just the first page.",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The data, as JSON.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "location": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "venice-l35"
+                        },
+                        "location_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "35"
+                        },
+                        "detail": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": false
+                        },
+                        "enrich": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 0,
+                          "description": "How many activities were enriched (0 when detail=false)"
+                        },
+                        "total": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 1152,
+                          "description": "The site's own count of activities for the location"
+                        },
+                        "complete": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": true,
+                          "description": "True when every activity the site counts was collected (false only if a very large location ran out of time; the list is then a subset)"
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 50,
+                          "description": "Activities in this page"
+                        },
+                        "activities": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "6849",
+                                "description": "Activity id (the -t<id> in its URL)"
+                              },
+                              "title": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Venice: Marco Polo Airport Water Taxi Transfer"
+                              },
+                              "abstract": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Make your arrival in Venice unforgettable with a water taxi transfer to your hotel or the nearest accessible point from Venice Airport.",
+                                "description": "Short summary shown on the listing card"
+                              },
+                              "url": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "https://www.getyourguide.com/venice-l35/venice-marco-polo-airport-transfer-shared-water-taxi-t6849/"
+                              },
+                              "price": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 39,
+                                "description": "Starting price (after any discount)"
+                              },
+                              "original_price": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 39,
+                                "description": "Price before discount"
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "EUR"
+                              },
+                              "price_label": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "per person",
+                                "description": "What the price covers, e.g. per person or per group"
+                              },
+                              "rating": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 4.37,
+                                "description": "Average rating (0-5)"
+                              },
+                              "rating_count": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ],
+                                "example": 29055,
+                                "description": "Number of reviews"
+                              },
+                              "category": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "transfer",
+                                "description": "Activity type, e.g. guidedTour, ticket, transfer"
+                              },
+                              "duration": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "50 minutes",
+                                "description": "Duration label as shown by the site"
+                              },
+                              "free_cancellation": {
+                                "type": [
+                                  "boolean",
+                                  "null"
+                                ],
+                                "example": true,
+                                "description": "Free cancellation offered"
+                              },
+                              "available_from": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "2026-11-14T13:30:00+01:00",
+                                "description": "Next availability datetime (ISO 8601)"
+                              },
+                              "location": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Venice",
+                                "description": "Place label shown on the card"
+                              },
+                              "image": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=270,height=180,dpr=2/tour_img/1b7db2e061cdbe72.jpeg",
+                                "description": "Card image URL"
+                              },
+                              "position": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ],
+                                "example": 1,
+                                "description": "1-based rank: the site's popularity order first, then the remaining activities by ascending price"
+                              },
+                              "detail": {
+                                "type": [
+                                  "object",
+                                  "null"
+                                ],
+                                "description": "Present on the top `enrich` activities when detail=true; null when that activity's detail could not be read.",
+                                "properties": {
+                                  "description": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ],
+                                    "example": "Explore the Grand Canal by boat..."
+                                  },
+                                  "images": {
+                                    "type": [
+                                      "array",
+                                      "null"
+                                    ],
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "reviews": {
+                                    "type": [
+                                      "array",
+                                      "null"
+                                    ],
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "author": {
+                                          "type": [
+                                            "string",
+                                            "null"
+                                          ],
+                                          "example": "James"
+                                        },
+                                        "rating": {
+                                          "type": [
+                                            "number",
+                                            "null"
+                                          ],
+                                          "example": 5
+                                        },
+                                        "title": {
+                                          "type": [
+                                            "string",
+                                            "null"
+                                          ],
+                                          "example": null
+                                        },
+                                        "text": {
+                                          "type": [
+                                            "string",
+                                            "null"
+                                          ],
+                                          "example": "Well worth it."
+                                        },
+                                        "date": {
+                                          "type": [
+                                            "string",
+                                            "null"
+                                          ],
+                                          "example": "2026-08-11T05:28:12+02:00"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "cached": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ],
+                      "example": false
+                    },
+                    "source": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "example": "getyourguide:combo"
+                    },
+                    "pagination": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "total": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 1152,
+                          "description": "Equals data.total (the site's own count) when data.complete is true"
+                        },
+                        "limit": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 50
+                        },
+                        "offset": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 0
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 50
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "402": {
+            "$ref": "#/components/responses/CreditLimitReached"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccountSuspended"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamFailed"
+          }
+        }
+      }
+    },
+    "/locations": {
+      "get": {
+        "operationId": "locations",
+        "summary": "Find a place by name",
+        "description": "Find GetYourGuide places (cities, regions, countries, attractions) by name: id, name, type, descriptor (e.g. 'City in Italy') and the place slug (e.g. venice-l35) that /activities, /activities-v2, /explore and /search take.\n\nEach successful request uses 10 credits.",
+        "x-credits": 10,
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Name of a city, region, country or attraction (any case, accents optional).",
+            "schema": {
+              "type": "string"
+            },
+            "example": "venice"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Max places to return (the site suggests up to 20).",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            },
+            "example": 50
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The data, as JSON.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "query": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "venice"
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 12
+                        },
+                        "locations": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "35",
+                                "description": "Place id"
+                              },
+                              "name": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Venice"
+                              },
+                              "slug": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "venice-l35",
+                                "description": "The value every location param of this API takes"
+                              },
+                              "type": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "city",
+                                "description": "city, area, country, poi (attraction), neighborhood, ..."
+                              },
+                              "descriptor": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "City in Italy"
+                              },
+                              "url": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "https://www.getyourguide.com/venice-l35/"
+                              },
+                              "image": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "https://cdn.getyourguide.com/img/location/5ffeb43d54f6e.jpeg/132.jpg"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "cached": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ],
+                      "example": false
+                    },
+                    "source": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "example": "getyourguide:autocomplete"
+                    },
+                    "pagination": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "total": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 12
+                        },
+                        "limit": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 50
+                        },
+                        "offset": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 0
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 12
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "402": {
+            "$ref": "#/components/responses/CreditLimitReached"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccountSuspended"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamFailed"
+          }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "operationId": "search",
+        "summary": "Search tours & activities with the site's filters",
+        "description": "Search GetYourGuide tours & activities by free text and/or place, with the site's filters (dates, price range, duration, minimum rating, languages, start time, features, categories, departure place) and sort orders. 24 results per page; data.total is the site's own count.\n\nEach successful request uses 10 credits for every 24 rows it returns (at least 10 credits).",
+        "x-credits": 10,
+        "x-credits-rows": 24,
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "Free text, as typed in the site's search box (an activity, attraction or place). q, location or both are required.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "gondola"
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "required": false,
+            "description": "Limit to one place: a place slug from /locations (venice-l35) or its numeric id (35).",
+            "schema": {
+              "type": "string"
+            },
+            "example": "venice-l35"
+          },
+          {
+            "name": "date_from",
+            "in": "query",
+            "required": false,
+            "description": "Only activities available on or after this date (YYYY-MM-DD). Alone, it searches that one day.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "date_to",
+            "in": "query",
+            "required": false,
+            "description": "Last day of the date range (YYYY-MM-DD); needs date_from.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "min_price",
+            "in": "query",
+            "required": false,
+            "description": "Lowest starting price, in EUR.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "required": false,
+            "description": "Highest starting price, in EUR.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "Order of the results. With q, the text match is weighed in too.",
+            "schema": {
+              "type": "string",
+              "default": "popularity",
+              "enum": [
+                "popularity",
+                "price_asc",
+                "price_desc",
+                "rating_desc"
+              ]
+            },
+            "example": "popularity"
+          },
+          {
+            "name": "languages",
+            "in": "query",
+            "required": false,
+            "description": "Guide/audio languages, comma separated ISO codes (en, de, fr, es, it, ...): activities offered in any of them.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "duration",
+            "in": "query",
+            "required": false,
+            "description": "Durations, comma separated: 0-3h, 3-5h, 5-7h, full-day, 2-days, 3-days, 4-days, 5-days-plus.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "min_rating",
+            "in": "query",
+            "required": false,
+            "description": "Minimum average rating.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "3.0",
+                "3.5",
+                "4.0",
+                "4.5"
+              ]
+            },
+            "example": "3.0"
+          },
+          {
+            "name": "start_time",
+            "in": "query",
+            "required": false,
+            "description": "Start times, comma separated: morning (before 12 PM), afternoon (12-5 PM), evening (after 5 PM).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "features",
+            "in": "query",
+            "required": false,
+            "description": "Features, comma separated: private, small-group, skip-the-line, wheelchair-accessible, hotel-pickup, originals.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categories",
+            "in": "query",
+            "required": false,
+            "description": "Category ids, comma separated: the tc<n> in a category page address (gondola-tours-tc264 -> tc-264).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "departs_from",
+            "in": "query",
+            "required": false,
+            "description": "Departure places, comma separated slugs or ids from /locations.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page of the site's results, 24 per page (1 to 34; the site serves no pages past about 34). data.total is the full count; narrow the query with filters to reach more rows.",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1,
+              "maximum": 34
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Rows of this page to return (default 50: the whole 24-row page).",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            },
+            "example": 50
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Rows of this page to skip.",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The data, as JSON.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "query": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "gondola"
+                        },
+                        "location": {
+                          "type": [
+                            "object",
+                            "null"
+                          ],
+                          "properties": {
+                            "input": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": "venice-l35"
+                            },
+                            "id": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": "35"
+                            }
+                          }
+                        },
+                        "filters": {
+                          "type": [
+                            "object",
+                            "null"
+                          ],
+                          "description": "The filters applied, as validated",
+                          "properties": {
+                            "date_from": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": null
+                            },
+                            "date_to": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": null
+                            },
+                            "min_price": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "example": null
+                            },
+                            "max_price": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "example": null
+                            },
+                            "languages": {
+                              "type": [
+                                "array",
+                                "null"
+                              ],
+                              "items": {
+                                "type": "string"
+                              },
+                              "example": []
+                            },
+                            "duration": {
+                              "type": [
+                                "array",
+                                "null"
+                              ],
+                              "items": {
+                                "type": "string"
+                              },
+                              "example": []
+                            },
+                            "min_rating": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": null
+                            },
+                            "start_time": {
+                              "type": [
+                                "array",
+                                "null"
+                              ],
+                              "items": {
+                                "type": "string"
+                              },
+                              "example": []
+                            },
+                            "features": {
+                              "type": [
+                                "array",
+                                "null"
+                              ],
+                              "items": {
+                                "type": "string"
+                              },
+                              "example": []
+                            },
+                            "categories": {
+                              "type": [
+                                "array",
+                                "null"
+                              ],
+                              "items": {
+                                "type": "string"
+                              },
+                              "example": []
+                            },
+                            "departs_from": {
+                              "type": [
+                                "array",
+                                "null"
+                              ],
+                              "items": {
+                                "type": "string"
+                              },
+                              "example": []
+                            }
+                          }
+                        },
+                        "sort": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "popularity"
+                        },
+                        "page": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 1
+                        },
+                        "page_size": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 24
+                        },
+                        "total": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 288,
+                          "description": "The site's own count of results for this query"
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": true,
+                          "description": "Another page can be requested with page+1"
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 24
+                        },
+                        "activities": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "221382",
+                                "description": "Activity id (the -t<id> in its URL)"
+                              },
+                              "title": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Venice: Grand Canal Gondola Ride with App Commentary"
+                              },
+                              "abstract": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Make your arrival in Venice unforgettable with a water taxi transfer to your hotel or the nearest accessible point from Venice Airport.",
+                                "description": "Short summary shown on the listing card"
+                              },
+                              "url": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "https://www.getyourguide.com/venice-l35/venice-marco-polo-airport-transfer-shared-water-taxi-t6849/"
+                              },
+                              "price": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 39,
+                                "description": "Starting price (after any discount)"
+                              },
+                              "original_price": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 39,
+                                "description": "Price before discount"
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "EUR"
+                              },
+                              "price_label": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "per person",
+                                "description": "What the price covers, e.g. per person or per group"
+                              },
+                              "rating": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 4.37,
+                                "description": "Average rating (0-5)"
+                              },
+                              "rating_count": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ],
+                                "example": 29055,
+                                "description": "Number of reviews"
+                              },
+                              "category": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "transfer",
+                                "description": "Activity type, e.g. guidedTour, ticket, transfer"
+                              },
+                              "duration": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "50 minutes",
+                                "description": "Duration label as shown by the site"
+                              },
+                              "free_cancellation": {
+                                "type": [
+                                  "boolean",
+                                  "null"
+                                ],
+                                "example": true,
+                                "description": "Free cancellation offered"
+                              },
+                              "available_from": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "2026-11-14T13:30:00+01:00",
+                                "description": "Next availability datetime (ISO 8601)"
+                              },
+                              "location": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Venice",
+                                "description": "Place label shown on the card"
+                              },
+                              "image": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=270,height=180,dpr=2/tour_img/1b7db2e061cdbe72.jpeg",
+                                "description": "Card image URL"
+                              },
+                              "position": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ],
+                                "example": 1,
+                                "description": "Rank in the site's order across pages (page 2 starts at 25)"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "cached": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ],
+                      "example": false
+                    },
+                    "source": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "example": "getyourguide:search"
+                    },
+                    "pagination": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "total": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 24,
+                          "description": "Rows in this page of the site's results (use page for more)"
+                        },
+                        "limit": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 50
+                        },
+                        "offset": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 0
+                        },
+                        "count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 24
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "402": {
+            "$ref": "#/components/responses/CreditLimitReached"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccountSuspended"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamFailed"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1055,7 +2646,7 @@
             },
             "example": {
               "error": "credit_limit_reached",
-              "message": "You've used all 5,000 credits in your Trial plan for this period. Upgrade your plan for a higher allotment."
+              "message": "You've used all 1,000 credits in your Free plan for this period. Upgrade your plan for a higher allotment."
             }
           }
         }
