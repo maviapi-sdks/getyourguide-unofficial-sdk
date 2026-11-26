@@ -16,7 +16,7 @@ export declare class ApiError extends Error {
   constructor(status: number, code: string, message: string);
 }
 
-export interface ActivitiesV2LocationParams {
+export interface ActivitiesV2ByLocationParams {
   /**
    * GetYourGuide place slug in the {city}-l{id} form (from /catalog or an activity URL)
    */
@@ -33,7 +33,7 @@ export interface ActivitiesV2LocationParams {
   "offset"?: number;
 }
 
-export interface ActivitiesLocationParams {
+export interface ActivitiesByLocationParams {
   /**
    * GetYourGuide place slug in the {city}-l{id} form (from /catalog or an activity URL)
    */
@@ -48,7 +48,7 @@ export interface ActivitiesLocationParams {
   "offset"?: number;
 }
 
-export interface ActivityIdParams {
+export interface ActivityByIdParams {
   /**
    * Numeric activity id (the …-t<id> in an activity URL)
    */
@@ -233,7 +233,7 @@ export declare class GetyourguideClient {
    *   offset (integer): Activities to skip. Works up to pagination.total (the site's
    *     full count), not just the first page
    */
-  activitiesV2Location(params: ActivitiesV2LocationParams): Promise<Record<string, any>>;
+  activitiesV2ByLocation(params: ActivitiesV2ByLocationParams): Promise<Record<string, any>>;
   /**
    * Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each
    * with price, rating, next availability date and destination.
@@ -246,7 +246,7 @@ export declare class GetyourguideClient {
    *   limit (integer): Max items per page (default 50, max 200)
    *   offset (integer): Items to skip for pagination
    */
-  activitiesLocation(params: ActivitiesLocationParams): Promise<Record<string, any>>;
+  activitiesByLocation(params: ActivitiesByLocationParams): Promise<Record<string, any>>;
   /**
    * Full detail for one activity by numeric id (e.g. 6851): title, description, images,
    * price, rating, review count and sample reviews.
@@ -256,7 +256,7 @@ export declare class GetyourguideClient {
    * Parameters:
    *   id (string, required): Numeric activity id (the …-t<id> in an activity URL)
    */
-  activityId(params: ActivityIdParams): Promise<Record<string, any>>;
+  activityById(params: ActivityByIdParams): Promise<Record<string, any>>;
   /**
    * Enumerate all activity URLs from a GetYourGuide activity sitemap file (?index, ~5000
    * each); each entry has the activity id and location slug.

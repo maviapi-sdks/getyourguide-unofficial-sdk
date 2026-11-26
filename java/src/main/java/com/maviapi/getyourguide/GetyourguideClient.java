@@ -77,7 +77,7 @@ public class GetyourguideClient {
      *   offset (integer): Activities to skip. Works up to pagination.total (the site's
      *     full count), not just the first page
      */
-    public String activitiesV2Location(Map<String, Object> params) {
+    public String activitiesV2ByLocation(Map<String, Object> params) {
         return get("/activities-v2/{location}", params, "location");
     }
 
@@ -93,7 +93,7 @@ public class GetyourguideClient {
      *   limit (integer): Max items per page (default 50, max 200)
      *   offset (integer): Items to skip for pagination
      */
-    public String activitiesLocation(Map<String, Object> params) {
+    public String activitiesByLocation(Map<String, Object> params) {
         return get("/activities/{location}", params, "location");
     }
 
@@ -106,7 +106,7 @@ public class GetyourguideClient {
      * Parameters:
      *   id (string, required): Numeric activity id (the …-t<id> in an activity URL)
      */
-    public String activityId(Map<String, Object> params) {
+    public String activityById(Map<String, Object> params) {
         return get("/activity/{id}", params, "id");
     }
 

@@ -56,7 +56,7 @@ class GetyourguideClient
      *
      * @return array<string, mixed>
      */
-    public function activitiesV2Location(string $location, ?int $limit = null, ?int $offset = null): array
+    public function activitiesV2ByLocation(string $location, ?int $limit = null, ?int $offset = null): array
     {
         return $this->get('/activities-v2/{location}', ['location' => $location, 'limit' => $limit, 'offset' => $offset]);
     }
@@ -75,7 +75,7 @@ class GetyourguideClient
      *
      * @return array<string, mixed>
      */
-    public function activitiesLocation(string $location, ?int $limit = null, ?int $offset = null): array
+    public function activitiesByLocation(string $location, ?int $limit = null, ?int $offset = null): array
     {
         return $this->get('/activities/{location}', ['location' => $location, 'limit' => $limit, 'offset' => $offset]);
     }
@@ -91,7 +91,7 @@ class GetyourguideClient
      *
      * @return array<string, mixed>
      */
-    public function activityId(string $id): array
+    public function activityById(string $id): array
     {
         return $this->get('/activity/{id}', ['id' => $id]);
     }

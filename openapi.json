@@ -23,7 +23,7 @@
   "paths": {
     "/activities-v2/{location}": {
       "get": {
-        "operationId": "activitiesV2Location",
+        "operationId": "activitiesV2ByLocation",
         "summary": "All activities for a location (every page)",
         "description": "Every tour & activity GetYourGuide lists for a location slug (e.g. venice-l35), all pages: price, rating, review count, duration, next availability, image. pagination.total matches the site's own count.\n\nEach successful request uses 10 credits for every 24 rows it returns (at least 10 credits).",
         "x-credits": 10,
@@ -65,6 +65,26 @@
         "responses": {
           "200": {
             "description": "The data, as JSON.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests the key may make in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window starts again.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -346,7 +366,7 @@
     },
     "/activities/{location}": {
       "get": {
-        "operationId": "activitiesLocation",
+        "operationId": "activitiesByLocation",
         "summary": "Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each with price, rating, next availability date and destination.",
         "description": "Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each with price, rating, next availability date and destination.\n\nEach successful request uses 10 credits.",
         "x-credits": 10,
@@ -387,6 +407,26 @@
         "responses": {
           "200": {
             "description": "The data, as JSON.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests the key may make in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window starts again.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -588,7 +628,7 @@
     },
     "/activity/{id}": {
       "get": {
-        "operationId": "activityId",
+        "operationId": "activityById",
         "summary": "Full detail for one activity by numeric id (e.g. 6851): title, description, images, price, rating, review count and sample reviews.",
         "description": "Full detail for one activity by numeric id (e.g. 6851): title, description, images, price, rating, review count and sample reviews.\n\nEach successful request uses 10 credits.",
         "x-credits": 10,
@@ -607,6 +647,26 @@
         "responses": {
           "200": {
             "description": "The data, as JSON.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests the key may make in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window starts again.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -812,6 +872,26 @@
         "responses": {
           "200": {
             "description": "The data, as JSON.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests the key may make in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window starts again.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -1037,6 +1117,26 @@
         "responses": {
           "200": {
             "description": "The data, as JSON.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests the key may make in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window starts again.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -1390,6 +1490,26 @@
         "responses": {
           "200": {
             "description": "The data, as JSON.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests the key may make in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window starts again.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -1797,6 +1917,26 @@
         "responses": {
           "200": {
             "description": "The data, as JSON.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests the key may make in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window starts again.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -2162,6 +2302,26 @@
         "responses": {
           "200": {
             "description": "The data, as JSON.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests the key may make in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window starts again.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -2594,7 +2754,8 @@
         "type": "object",
         "required": [
           "error",
-          "message"
+          "message",
+          "retryable"
         ],
         "properties": {
           "error": {
@@ -2604,6 +2765,10 @@
           "message": {
             "type": "string",
             "description": "What went wrong, in a sentence."
+          },
+          "retryable": {
+            "type": "boolean",
+            "description": "Whether the same request may succeed later without any change. When true, wait the seconds in `Retry-After` (if sent) first."
           }
         }
       }
@@ -2618,7 +2783,8 @@
             },
             "example": {
               "error": "bad_request",
-              "message": "Missing required query parameter: q"
+              "message": "Missing required query parameter: q",
+              "retryable": false
             }
           }
         }
@@ -2632,7 +2798,8 @@
             },
             "example": {
               "error": "missing_api_key",
-              "message": "Provide an API key via the Authorization: Bearer <key> header."
+              "message": "Provide an API key via the Authorization: Bearer <key> header.",
+              "retryable": false
             }
           }
         }
@@ -2646,7 +2813,8 @@
             },
             "example": {
               "error": "credit_limit_reached",
-              "message": "You've used all 1,000 credits in your Free plan for this period. Upgrade your plan for a higher allotment."
+              "message": "You've used all 1,000 credits in your Free plan for this period. Upgrade your plan for a higher allotment.",
+              "retryable": false
             }
           }
         }
@@ -2660,13 +2828,14 @@
             },
             "example": {
               "error": "account_banned",
-              "message": "Your account is suspended."
+              "message": "Your account is suspended.",
+              "retryable": false
             }
           }
         }
       },
       "RateLimited": {
-        "description": "Too many requests for this key. Wait the number of seconds in `Retry-After`.",
+        "description": "Too many requests for this key (`rate_limited`), or too many at once for its plan (`concurrency_limited`). Wait the number of seconds in `Retry-After`.",
         "headers": {
           "Retry-After": {
             "description": "Seconds to wait before retrying.",
@@ -2682,13 +2851,22 @@
             },
             "example": {
               "error": "rate_limited",
-              "message": "Rate limit exceeded for this API key."
+              "message": "Rate limit exceeded for this API key (600 requests a minute).",
+              "retryable": true
             }
           }
         }
       },
       "UpstreamFailed": {
         "description": "The source site could not be read this time. Retrying later usually works.",
+        "headers": {
+          "Retry-After": {
+            "description": "Seconds to wait before retrying.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        },
         "content": {
           "application/json": {
             "schema": {
@@ -2696,7 +2874,8 @@
             },
             "example": {
               "error": "scrape_failed",
-              "message": "The upstream source could not be fetched"
+              "message": "The upstream source could not be fetched",
+              "retryable": true
             }
           }
         }

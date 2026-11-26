@@ -64,7 +64,7 @@ func New(apiKey string) *Client {
 	}
 }
 
-// ActivitiesV2Location: Every tour & activity GetYourGuide lists for a location slug (e.g. venice-l35), all
+// ActivitiesV2ByLocation: Every tour & activity GetYourGuide lists for a location slug (e.g. venice-l35), all
 // pages: price, rating, review count, duration, next availability, image.
 // pagination.total matches the site's own count.
 //
@@ -80,11 +80,11 @@ func New(apiKey string) *Client {
 //     same full list
 //   - offset (integer): Activities to skip. Works up to pagination.total (the site's
 //     full count), not just the first page
-func (c *Client) ActivitiesV2Location(ctx context.Context, params Params) (json.RawMessage, error) {
+func (c *Client) ActivitiesV2ByLocation(ctx context.Context, params Params) (json.RawMessage, error) {
 	return c.get(ctx, "/activities-v2/{location}", params, "location")
 }
 
-// ActivitiesLocation: Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each
+// ActivitiesByLocation: Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each
 // with price, rating, next availability date and destination.
 //
 // Each successful request uses 10 credits.
@@ -95,11 +95,11 @@ func (c *Client) ActivitiesV2Location(ctx context.Context, params Params) (json.
 //     (from /catalog or an activity URL)
 //   - limit (integer): Max items per page (default 50, max 200)
 //   - offset (integer): Items to skip for pagination
-func (c *Client) ActivitiesLocation(ctx context.Context, params Params) (json.RawMessage, error) {
+func (c *Client) ActivitiesByLocation(ctx context.Context, params Params) (json.RawMessage, error) {
 	return c.get(ctx, "/activities/{location}", params, "location")
 }
 
-// ActivityId: Full detail for one activity by numeric id (e.g. 6851): title, description, images,
+// ActivityById: Full detail for one activity by numeric id (e.g. 6851): title, description, images,
 // price, rating, review count and sample reviews.
 //
 // Each successful request uses 10 credits.
@@ -107,7 +107,7 @@ func (c *Client) ActivitiesLocation(ctx context.Context, params Params) (json.Ra
 // Parameters:
 //
 //   - id (string, required): Numeric activity id (the …-t<id> in an activity URL)
-func (c *Client) ActivityId(ctx context.Context, params Params) (json.RawMessage, error) {
+func (c *Client) ActivityById(ctx context.Context, params Params) (json.RawMessage, error) {
 	return c.get(ctx, "/activity/{id}", params, "id")
 }
 

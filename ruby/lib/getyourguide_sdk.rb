@@ -48,7 +48,7 @@ module GetyourguideSdk
     #     same full list
     #   offset (integer): Activities to skip. Works up to pagination.total (the site's
     #     full count), not just the first page
-    def activities_v2_location(**params)
+    def activities_v2_by_location(**params)
       get("/activities-v2/{location}", params, %w[location])
     end
 
@@ -62,7 +62,7 @@ module GetyourguideSdk
     #     (from /catalog or an activity URL)
     #   limit (integer): Max items per page (default 50, max 200)
     #   offset (integer): Items to skip for pagination
-    def activities_location(**params)
+    def activities_by_location(**params)
       get("/activities/{location}", params, %w[location])
     end
 
@@ -73,7 +73,7 @@ module GetyourguideSdk
     #
     # Parameters:
     #   id (string, required): Numeric activity id (the …-t<id> in an activity URL)
-    def activity_id(**params)
+    def activity_by_id(**params)
       get("/activity/{id}", params, %w[id])
     end
 

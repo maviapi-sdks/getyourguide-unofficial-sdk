@@ -21,7 +21,7 @@ pip install "git+https://github.com/maviapi-sdks/getyourguide-unofficial-sdk#sub
 from getyourguide_sdk import GetyourguideClient
 
 client = GetyourguideClient()  # or GetyourguideClient("mvk_live_...")
-result = client.activities_location(location="venice-l35", limit=5)
+result = client.explore(location="venice-l35", limit=5)
 print(result)
 ```
 
@@ -35,7 +35,7 @@ npm install github:maviapi-sdks/getyourguide-unofficial-sdk
 import { GetyourguideClient } from "getyourguide-unofficial-sdk";
 
 const client = new GetyourguideClient(); // or new GetyourguideClient({ apiKey: "mvk_live_..." })
-const result = await client.activitiesLocation({ location: "venice-l35", limit: 5 });
+const result = await client.explore({ location: "venice-l35", limit: 5 });
 console.log(result);
 ```
 
@@ -58,7 +58,7 @@ import (
 
 func main() {
 	client := getyourguide.New("") // or getyourguide.New("mvk_live_...")
-	result, err := client.ActivitiesLocation(context.Background(), getyourguide.Params{"location": "venice-l35", "limit": 5})
+	result, err := client.Explore(context.Background(), getyourguide.Params{"location": "venice-l35", "limit": 5})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,7 +81,7 @@ require 'vendor/autoload.php';
 use GetyourguideSdk\GetyourguideClient;
 
 $client = new GetyourguideClient(); // or new GetyourguideClient('mvk_live_...')
-$result = $client->activitiesLocation(location: 'venice-l35', limit: 5);
+$result = $client->explore(location: 'venice-l35', limit: 5);
 print_r($result);
 ```
 
@@ -96,7 +96,7 @@ gem "getyourguide_sdk", git: "https://github.com/maviapi-sdks/getyourguide-unoff
 require "getyourguide_sdk"
 
 client = GetyourguideSdk::Client.new # or GetyourguideSdk::Client.new(api_key: "mvk_live_...")
-result = client.activities_location(location: "venice-l35", limit: 5)
+result = client.explore(location: "venice-l35", limit: 5)
 puts result
 ```
 
@@ -125,7 +125,7 @@ import java.util.Map;
 public class Example {
     public static void main(String[] args) {
         GetyourguideClient client = new GetyourguideClient(); // or new GetyourguideClient("mvk_live_...")
-        String json = client.activitiesLocation(Map.of("location", "venice-l35", "limit", 5));
+        String json = client.explore(Map.of("location", "venice-l35", "limit", 5));
         System.out.println(json);
     }
 }
@@ -144,7 +144,7 @@ The client is one file with no dependencies, so you can also copy [`Getyourguide
 using GetyourguideSdk;
 
 var client = new GetyourguideClient(); // or new GetyourguideClient("mvk_live_...")
-var result = await client.ActivitiesLocationAsync(new Dictionary<string, object?> { ["location"] = "venice-l35", ["limit"] = 5 });
+var result = await client.ExploreAsync(new Dictionary<string, object?> { ["location"] = "venice-l35", ["limit"] = 5 });
 Console.WriteLine(result);
 ```
 
@@ -177,7 +177,7 @@ A request the API answers with an error status raises an `ApiError` (in Go, retu
 | 401 | `missing_api_key` | No API key was sent, or the key is invalid or revoked (`missing_api_key`, `invalid_api_key`). |
 | 402 | `credit_limit_reached` | The plan's credits for this period are used up. |
 | 403 | `account_banned` | The account that owns the key is suspended. |
-| 429 | `rate_limited` | Too many requests for this key. Wait the number of seconds in `Retry-After`. |
+| 429 | `rate_limited` | Too many requests for this key (`rate_limited`), or too many at once for its plan (`concurrency_limited`). Wait the number of seconds in `Retry-After`. |
 | 502 | `scrape_failed` | The source site could not be read this time. Retrying later usually works. |
 
 ## Endpoint reference
@@ -190,7 +190,7 @@ Every tour & activity GetYourGuide lists for a location slug (e.g. venice-l35), 
 
 Each successful request uses 10 credits for every 24 rows it returns (at least 10 credits).
 
-Methods: `activities_v2_location` (Python, Ruby) · `activitiesV2Location` (JavaScript/TypeScript, PHP, Java) · `ActivitiesV2Location` (Go) · `ActivitiesV2LocationAsync` (C#)
+Methods: `activities_v2_by_location` (Python, Ruby) · `activitiesV2ByLocation` (JavaScript/TypeScript, PHP, Java) · `ActivitiesV2ByLocation` (Go) · `ActivitiesV2ByLocationAsync` (C#)
 
 Parameters:
 
@@ -251,7 +251,7 @@ Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), eac
 
 Each successful request uses 10 credits.
 
-Methods: `activities_location` (Python, Ruby) · `activitiesLocation` (JavaScript/TypeScript, PHP, Java) · `ActivitiesLocation` (Go) · `ActivitiesLocationAsync` (C#)
+Methods: `activities_by_location` (Python, Ruby) · `activitiesByLocation` (JavaScript/TypeScript, PHP, Java) · `ActivitiesByLocation` (Go) · `ActivitiesByLocationAsync` (C#)
 
 Parameters:
 
@@ -303,7 +303,7 @@ Full detail for one activity by numeric id (e.g. 6851): title, description, imag
 
 Each successful request uses 10 credits.
 
-Methods: `activity_id` (Python, Ruby) · `activityId` (JavaScript/TypeScript, PHP, Java) · `ActivityId` (Go) · `ActivityIdAsync` (C#)
+Methods: `activity_by_id` (Python, Ruby) · `activityById` (JavaScript/TypeScript, PHP, Java) · `ActivityById` (Go) · `ActivityByIdAsync` (C#)
 
 Parameters:
 
@@ -698,7 +698,7 @@ Parameters:
 - [maviapi MCP server](https://maviapi.com/docs#mcp): the same API as tools for Claude, Cursor and other AI agents.
 - [All maviapi APIs](https://maviapi.com/apis?utm_source=github&utm_medium=readme&utm_campaign=sdk-getyourguide). Need a website that is not there? [Ask for it](https://maviapi.com/?utm_source=github&utm_medium=readme&utm_campaign=sdk-getyourguide) and get an API for it.
 
-Other unofficial SDKs: [Airbnb](https://github.com/maviapi-sdks/airbnb-unofficial-sdk) · [Booking.com](https://github.com/maviapi-sdks/booking-unofficial-sdk) · [Kiwi.com](https://github.com/maviapi-sdks/kiwi-unofficial-sdk) · [MarineTraffic](https://github.com/maviapi-sdks/marinetraffic-unofficial-sdk) · [Speedtest](https://github.com/maviapi-sdks/speedtest-unofficial-sdk) · [Trainline](https://github.com/maviapi-sdks/trainline-unofficial-sdk) · [Trendyol](https://github.com/maviapi-sdks/trendyol-unofficial-sdk) · [Tripadvisor](https://github.com/maviapi-sdks/tripadvisor-unofficial-sdk) · [Yemeksepeti](https://github.com/maviapi-sdks/yemeksepeti-unofficial-sdk)
+Other unofficial SDKs: [Airbnb](https://github.com/maviapi-sdks/airbnb-unofficial-sdk) · [Booking.com](https://github.com/maviapi-sdks/booking-unofficial-sdk) · [Google Search](https://github.com/maviapi-sdks/google-search-unofficial-sdk) · [Kiwi.com](https://github.com/maviapi-sdks/kiwi-unofficial-sdk) · [MarineTraffic](https://github.com/maviapi-sdks/marinetraffic-unofficial-sdk) · [Speedtest](https://github.com/maviapi-sdks/speedtest-unofficial-sdk) · [Trainline](https://github.com/maviapi-sdks/trainline-unofficial-sdk) · [Trendyol](https://github.com/maviapi-sdks/trendyol-unofficial-sdk) · [Tripadvisor](https://github.com/maviapi-sdks/tripadvisor-unofficial-sdk) · [Yemeksepeti](https://github.com/maviapi-sdks/yemeksepeti-unofficial-sdk)
 
 ## License
 

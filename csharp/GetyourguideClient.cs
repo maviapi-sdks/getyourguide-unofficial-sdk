@@ -55,7 +55,7 @@ public class GetyourguideClient
     //     same full list
     //   offset (integer): Activities to skip. Works up to pagination.total (the site's
     //     full count), not just the first page
-    public Task<JsonElement> ActivitiesV2LocationAsync(IDictionary<string, object?> parameters, CancellationToken cancellationToken = default) =>
+    public Task<JsonElement> ActivitiesV2ByLocationAsync(IDictionary<string, object?> parameters, CancellationToken cancellationToken = default) =>
         GetAsync("/activities-v2/{location}", parameters, cancellationToken, "location");
 
     // Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each
@@ -68,7 +68,7 @@ public class GetyourguideClient
     //     (from /catalog or an activity URL)
     //   limit (integer): Max items per page (default 50, max 200)
     //   offset (integer): Items to skip for pagination
-    public Task<JsonElement> ActivitiesLocationAsync(IDictionary<string, object?> parameters, CancellationToken cancellationToken = default) =>
+    public Task<JsonElement> ActivitiesByLocationAsync(IDictionary<string, object?> parameters, CancellationToken cancellationToken = default) =>
         GetAsync("/activities/{location}", parameters, cancellationToken, "location");
 
     // Full detail for one activity by numeric id (e.g. 6851): title, description, images,
@@ -78,7 +78,7 @@ public class GetyourguideClient
     //
     // Parameters:
     //   id (string, required): Numeric activity id (the …-t<id> in an activity URL)
-    public Task<JsonElement> ActivityIdAsync(IDictionary<string, object?> parameters, CancellationToken cancellationToken = default) =>
+    public Task<JsonElement> ActivityByIdAsync(IDictionary<string, object?> parameters, CancellationToken cancellationToken = default) =>
         GetAsync("/activity/{id}", parameters, cancellationToken, "id");
 
     // Enumerate all activity URLs from a GetYourGuide activity sitemap file (?index, ~5000

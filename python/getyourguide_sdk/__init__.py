@@ -49,7 +49,7 @@ class GetyourguideClient:
         self.base_url = root.rstrip("/") + "/v1/sites/getyourguide"
         self.timeout = timeout
 
-    def activities_v2_location(self, *, location: str, limit: Optional[int] = None, offset: Optional[int] = None) -> Dict[str, Any]:
+    def activities_v2_by_location(self, *, location: str, limit: Optional[int] = None, offset: Optional[int] = None) -> Dict[str, Any]:
         """
         Every tour & activity GetYourGuide lists for a location slug (e.g. venice-l35), all
         pages: price, rating, review count, duration, next availability, image.
@@ -69,7 +69,7 @@ class GetyourguideClient:
         """
         return self._get("/activities-v2/{location}", {"location": location, "limit": limit, "offset": offset})
 
-    def activities_location(self, *, location: str, limit: Optional[int] = None, offset: Optional[int] = None) -> Dict[str, Any]:
+    def activities_by_location(self, *, location: str, limit: Optional[int] = None, offset: Optional[int] = None) -> Dict[str, Any]:
         """
         Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each
         with price, rating, next availability date and destination.
@@ -84,7 +84,7 @@ class GetyourguideClient:
         """
         return self._get("/activities/{location}", {"location": location, "limit": limit, "offset": offset})
 
-    def activity_id(self, *, id: str) -> Dict[str, Any]:
+    def activity_by_id(self, *, id: str) -> Dict[str, Any]:
         """
         Full detail for one activity by numeric id (e.g. 6851): title, description, images,
         price, rating, review count and sample reviews.

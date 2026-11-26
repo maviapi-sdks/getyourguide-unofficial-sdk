@@ -36,7 +36,7 @@ export class GetyourguideClient {
    * Each successful request uses 10 credits for every 24 rows it returns (at least 10
    * credits).
    */
-  activitiesV2Location(params) {
+  activitiesV2ByLocation(params) {
     return this.request("/activities-v2/{location}", params, ["location"]);
   }
 
@@ -46,7 +46,7 @@ export class GetyourguideClient {
    *
    * Each successful request uses 10 credits.
    */
-  activitiesLocation(params) {
+  activitiesByLocation(params) {
     return this.request("/activities/{location}", params, ["location"]);
   }
 
@@ -56,7 +56,7 @@ export class GetyourguideClient {
    *
    * Each successful request uses 10 credits.
    */
-  activityId(params) {
+  activityById(params) {
     return this.request("/activity/{id}", params, ["id"]);
   }
 
