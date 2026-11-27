@@ -98,6 +98,21 @@ public class GetyourguideClient {
     }
 
     /**
+     * Full detail for one activity by numeric id (e.g. 6851), as /activity/{id}, plus
+     * where it happens: meeting point (name, address, coordinates), other start and end
+     * points, the main attraction and stops with coordinates, city slug and id, duration
+     * in minutes, languages, category, free cancellation and the activity url.
+     *
+     * Each successful request uses 10 credits.
+     *
+     * Parameters:
+     *   id (string, required): Numeric activity id (the …-t<id> in an activity URL)
+     */
+    public String activityV2ById(Map<String, Object> params) {
+        return get("/activity-v2/{id}", params, "id");
+    }
+
+    /**
      * Full detail for one activity by numeric id (e.g. 6851): title, description, images,
      * price, rating, review count and sample reviews.
      *

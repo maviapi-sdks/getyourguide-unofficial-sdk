@@ -2,7 +2,7 @@
 
 Unofficial **GetYourGuide API** client for Python, JavaScript/TypeScript, Go, PHP, Ruby, Java and C#. Tour & activity listings from GetYourGuide — prices, ratings, availability dates and destinations, plus per-activity detail and bulk sitemap discovery.
 
-- **8 endpoints**, each returning JSON, with one method per endpoint in every language.
+- **9 endpoints**, each returning JSON, with one method per endpoint in every language.
 - **Works with no setup.** With no key, a client uses a shared demo key (30 requests a minute and 300 a day per network).
 - **Your own key lifts the limit.** [Create a free key](https://maviapi.com/sign-up?utm_source=github&utm_medium=readme&utm_campaign=sdk-getyourguide): a 7-day trial with 5,000 credits, no card.
 - **Kept working.** The API is hosted by [maviapi](https://maviapi.com/apis/getyourguide?utm_source=github&utm_medium=readme&utm_campaign=sdk-getyourguide), which monitors it and repairs it when the website changes.
@@ -154,6 +154,7 @@ Console.WriteLine(result);
 |---|---|---|
 | [`GET /activities-v2/{location}`](#get-activities-v2location) | Every tour & activity GetYourGuide lists for a location slug (e.g. | 10 |
 | [`GET /activities/{location}`](#get-activitieslocation) | Tour & activity listings for a GetYourGuide location slug (e.g. | 10 |
+| [`GET /activity-v2/{id}`](#get-activity-v2id) | Full detail for one activity by numeric id (e.g. | 10 |
 | [`GET /activity/{id}`](#get-activityid) | Full detail for one activity by numeric id (e.g. | 10 |
 | [`GET /catalog`](#get-catalog) | Enumerate all activity URLs from a GetYourGuide activity sitemap file (?index, ~5000 each); each entry has the activity id and location slug. | 1 |
 | [`GET /explore`](#get-explore) | Resolve a location's tour/activity listings and optionally enrich the top N with full detail (description, images, reviews) in one call. | 10 |
@@ -173,7 +174,7 @@ A request the API answers with an error status raises an `ApiError` (in Go, retu
 
 | Status | Code | Meaning |
 |---|---|---|
-| 400 | `bad_request` | A parameter is missing or cannot be used. |
+| 400 | `bad_request` | A parameter is missing or cannot be used (`bad_request`), or, with the `x-maviapi-strict: 1` request header, a query param the operation does not take was sent (`unknown_param`, with the names in `params`). |
 | 401 | `missing_api_key` | No API key was sent, or the key is invalid or revoked (`missing_api_key`, `invalid_api_key`). |
 | 402 | `credit_limit_reached` | The plan's credits for this period are used up. |
 | 403 | `account_banned` | The account that owns the key is suspended. |
@@ -182,7 +183,7 @@ A request the API answers with an error status raises an `ApiError` (in Go, retu
 
 ## Endpoint reference
 
-Base URL: `https://api.maviapi.com/v1/sites/getyourguide`. API version 2026-11-25. The same contract is in [`openapi.json`](openapi.json).
+Base URL: `https://api.maviapi.com/v1/sites/getyourguide`. API version 2026-11-27. The same contract is in [`openapi.json`](openapi.json).
 
 ### `GET /activities-v2/{location}`
 
@@ -292,6 +293,125 @@ Parameters:
     "count": 16,
     "has_more": false
   }
+}
+```
+
+</details>
+
+### `GET /activity-v2/{id}`
+
+Full detail for one activity by numeric id (e.g. 6851), as /activity/{id}, plus where it happens: meeting point (name, address, coordinates), other start and end points, the main attraction and stops with coordinates, city slug and id, duration in minutes, languages, category, free cancellation and the activity url.
+
+Each successful request uses 10 credits.
+
+Methods: `activity_v2_by_id` (Python, Ruby) · `activityV2ById` (JavaScript/TypeScript, PHP, Java) · `ActivityV2ById` (Go) · `ActivityV2ByIdAsync` (C#)
+
+Parameters:
+
+- `id` (string, required, in the path): Numeric activity id (the …-t<id> in an activity URL). Example: `631866`.
+
+<details>
+<summary>Example response</summary>
+
+```json
+{
+  "data": {
+    "id": "6851",
+    "title": "Venice: Grand Canal Boat Tour",
+    "description": "Enjoy a boat tour on the Grand Canal of Venice...",
+    "images": [
+      null
+    ],
+    "price": 45,
+    "currency": "EUR",
+    "rating": 4.176025694659586,
+    "review_count": 1100,
+    "reviews": [
+      {
+        "author": "James",
+        "rating": 5,
+        "title": null,
+        "text": "Our guide was brilliant and answered any questions put to her. Well worth it.",
+        "date": "2026-08-11T05:28:12+02:00"
+      }
+    ],
+    "url": "https://www.getyourguide.com/rome-l33/rome-colosseum-underground-experience-with-roman-forum-t631866/",
+    "meeting_point": {
+      "name": "Arch of Constantine",
+      "address": "Piazza del Colosseo, 00184 Roma RM, Italy",
+      "description": "Meet your guide at the Arch of Constantine.",
+      "latitude": 41.8898113,
+      "longitude": 12.4906782
+    },
+    "meeting_point_note": null,
+    "pickup_available": false,
+    "start_points": [
+      {
+        "name": "Arch of Constantine",
+        "address": "Piazza del Colosseo, 00184 Roma RM, Italy",
+        "description": "Meet your guide at the Arch of Constantine.",
+        "latitude": 41.8898113,
+        "longitude": 12.4906782
+      }
+    ],
+    "end_points": [
+      {
+        "name": "Arch of Constantine",
+        "address": "Piazza del Colosseo, 00184 Roma RM, Italy",
+        "description": "Meet your guide at the Arch of Constantine.",
+        "latitude": 41.8898113,
+        "longitude": 12.4906782
+      }
+    ],
+    "end_point_note": "You'll return to the meeting point at the end of the activity.",
+    "attraction": {
+      "id": "2618",
+      "name": "Roman Forum",
+      "url": null,
+      "latitude": 41.8924623,
+      "longitude": 12.485325
+    },
+    "places_visited": [
+      {
+        "name": "Arch of Constantine",
+        "address": "Piazza del Colosseo, 00184 Roma RM, Italy",
+        "description": "Meet your guide at the Arch of Constantine.",
+        "latitude": 41.8898113,
+        "longitude": 12.4906782
+      }
+    ],
+    "city": {
+      "id": "33",
+      "name": "Rome",
+      "slug": "rome-l33"
+    },
+    "country": {
+      "id": "169011",
+      "name": "Italy"
+    },
+    "duration": "2.5 - 3 hours",
+    "duration_minutes": 150,
+    "duration_max_minutes": 180,
+    "languages": [
+      null
+    ],
+    "language_options": [
+      {
+        "type": "Live tour guide",
+        "languages": [
+          null
+        ]
+      }
+    ],
+    "free_cancellation": true,
+    "cancellation_policy": "Cancel up to 7 days in advance for a full refund",
+    "category": "guidedTour",
+    "category_ids": [
+      null
+    ]
+  },
+  "cached": false,
+  "source": "getyourguide:activity"
 }
 ```
 
@@ -698,7 +818,7 @@ Parameters:
 - [maviapi MCP server](https://maviapi.com/docs#mcp): the same API as tools for Claude, Cursor and other AI agents.
 - [All maviapi APIs](https://maviapi.com/apis?utm_source=github&utm_medium=readme&utm_campaign=sdk-getyourguide). Need a website that is not there? [Ask for it](https://maviapi.com/?utm_source=github&utm_medium=readme&utm_campaign=sdk-getyourguide) and get an API for it.
 
-Other unofficial SDKs: [Airbnb](https://github.com/maviapi-sdks/airbnb-unofficial-sdk) · [Booking.com](https://github.com/maviapi-sdks/booking-unofficial-sdk) · [Google Search](https://github.com/maviapi-sdks/google-search-unofficial-sdk) · [Kiwi.com](https://github.com/maviapi-sdks/kiwi-unofficial-sdk) · [MarineTraffic](https://github.com/maviapi-sdks/marinetraffic-unofficial-sdk) · [Speedtest](https://github.com/maviapi-sdks/speedtest-unofficial-sdk) · [Trainline](https://github.com/maviapi-sdks/trainline-unofficial-sdk) · [Trendyol](https://github.com/maviapi-sdks/trendyol-unofficial-sdk) · [Tripadvisor](https://github.com/maviapi-sdks/tripadvisor-unofficial-sdk) · [Yemeksepeti](https://github.com/maviapi-sdks/yemeksepeti-unofficial-sdk)
+Other unofficial SDKs: [Airbnb](https://github.com/maviapi-sdks/airbnb-unofficial-sdk) · [Booking.com](https://github.com/maviapi-sdks/booking-unofficial-sdk) · [FlightList](https://github.com/maviapi-sdks/flightlist-unofficial-sdk) · [Google Search](https://github.com/maviapi-sdks/google-search-unofficial-sdk) · [Kiwi.com](https://github.com/maviapi-sdks/kiwi-unofficial-sdk) · [MarineTraffic](https://github.com/maviapi-sdks/marinetraffic-unofficial-sdk) · [Speedtest](https://github.com/maviapi-sdks/speedtest-unofficial-sdk) · [Trainline](https://github.com/maviapi-sdks/trainline-unofficial-sdk) · [Trendyol](https://github.com/maviapi-sdks/trendyol-unofficial-sdk) · [Tripadvisor](https://github.com/maviapi-sdks/tripadvisor-unofficial-sdk) · [Yemeksepeti](https://github.com/maviapi-sdks/yemeksepeti-unofficial-sdk)
 
 ## License
 

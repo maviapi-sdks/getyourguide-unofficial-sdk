@@ -99,6 +99,20 @@ func (c *Client) ActivitiesByLocation(ctx context.Context, params Params) (json.
 	return c.get(ctx, "/activities/{location}", params, "location")
 }
 
+// ActivityV2ById: Full detail for one activity by numeric id (e.g. 6851), as /activity/{id}, plus
+// where it happens: meeting point (name, address, coordinates), other start and end
+// points, the main attraction and stops with coordinates, city slug and id, duration
+// in minutes, languages, category, free cancellation and the activity url.
+//
+// Each successful request uses 10 credits.
+//
+// Parameters:
+//
+//   - id (string, required): Numeric activity id (the …-t<id> in an activity URL)
+func (c *Client) ActivityV2ById(ctx context.Context, params Params) (json.RawMessage, error) {
+	return c.get(ctx, "/activity-v2/{id}", params, "id")
+}
+
 // ActivityById: Full detail for one activity by numeric id (e.g. 6851): title, description, images,
 // price, rating, review count and sample reviews.
 //

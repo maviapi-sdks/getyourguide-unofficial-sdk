@@ -84,6 +84,20 @@ class GetyourguideClient:
         """
         return self._get("/activities/{location}", {"location": location, "limit": limit, "offset": offset})
 
+    def activity_v2_by_id(self, *, id: str) -> Dict[str, Any]:
+        """
+        Full detail for one activity by numeric id (e.g. 6851), as /activity/{id}, plus
+        where it happens: meeting point (name, address, coordinates), other start and end
+        points, the main attraction and stops with coordinates, city slug and id, duration
+        in minutes, languages, category, free cancellation and the activity url.
+
+        Each successful request uses 10 credits.
+
+        Parameters:
+          id (string, required): Numeric activity id (the …-t<id> in an activity URL)
+        """
+        return self._get("/activity-v2/{id}", {"id": id})
+
     def activity_by_id(self, *, id: str) -> Dict[str, Any]:
         """
         Full detail for one activity by numeric id (e.g. 6851): title, description, images,

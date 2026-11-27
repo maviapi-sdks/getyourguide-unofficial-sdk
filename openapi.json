@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "GetYourGuide API",
-    "version": "2026-11-25",
-    "description": "Tour & activity listings from GetYourGuide — prices, ratings, availability dates and destinations, plus per-activity detail and bulk sitemap discovery.\n\nEvery request needs an API key in the `Authorization: Bearer <key>` header. Create one at https://maviapi.com/dashboard/keys. A successful request uses one credit, unless its operation says more (`x-credits`). That price covers 200 rows (or the operation's `x-credits-rows`); a request that returns more pays it again for each further page of that many rows. The `x-maviapi-credits` response header says what a request cost.\n\nEndpoint reference with live examples: https://maviapi.com/apis/getyourguide",
+    "version": "2026-11-27",
+    "description": "Tour & activity listings from GetYourGuide — prices, ratings, availability dates and destinations, plus per-activity detail and bulk sitemap discovery.\n\nEvery request needs an API key in the `Authorization: Bearer <key>` header. Create one at https://maviapi.com/dashboard/keys. A successful request uses one credit, unless its operation says more (`x-credits`). That price covers 200 rows (or the operation's `x-credits-rows`); a request that returns more pays it again for each further page of that many rows. The `x-maviapi-credits` response header says what a request cost. A query param an operation does not take is ignored and named in the `x-maviapi-unknown-params` response header; send the `x-maviapi-strict: 1` request header to have such a request refused with a free `400 unknown_param` instead.\n\nEndpoint reference with live examples: https://maviapi.com/apis/getyourguide",
     "termsOfService": "https://maviapi.com/terms"
   },
   "externalDocs": {
@@ -82,6 +82,12 @@
                 "description": "Seconds until the window starts again.",
                 "schema": {
                   "type": "integer"
+                }
+              },
+              "x-maviapi-unknown-params": {
+                "description": "Query params this endpoint does not take, comma separated; they were ignored. Send `x-maviapi-strict: 1` to get a free `400 unknown_param` instead.",
+                "schema": {
+                  "type": "string"
                 }
               }
             },
@@ -425,6 +431,12 @@
                 "schema": {
                   "type": "integer"
                 }
+              },
+              "x-maviapi-unknown-params": {
+                "description": "Query params this endpoint does not take, comma separated; they were ignored. Send `x-maviapi-strict: 1` to get a free `400 unknown_param` instead.",
+                "schema": {
+                  "type": "string"
+                }
               }
             },
             "content": {
@@ -626,6 +638,645 @@
         }
       }
     },
+    "/activity-v2/{id}": {
+      "get": {
+        "operationId": "activityV2ById",
+        "summary": "Activity detail plus where it happens: meeting point, start and end points, attraction and stops with coordinates, city, duration in minutes, languages, category, free cancellation and url.",
+        "description": "Full detail for one activity by numeric id (e.g. 6851), as /activity/{id}, plus where it happens: meeting point (name, address, coordinates), other start and end points, the main attraction and stops with coordinates, city slug and id, duration in minutes, languages, category, free cancellation and the activity url.\n\nEach successful request uses 10 credits.",
+        "x-credits": 10,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Numeric activity id (the …-t<id> in an activity URL).",
+            "schema": {
+              "type": "string"
+            },
+            "example": "631866"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The data, as JSON.",
+            "headers": {
+              "RateLimit-Limit": {
+                "description": "Requests the key may make in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "RateLimit-Reset": {
+                "description": "Seconds until the window starts again.",
+                "schema": {
+                  "type": "integer"
+                }
+              },
+              "x-maviapi-unknown-params": {
+                "description": "Query params this endpoint does not take, comma separated; they were ignored. Send `x-maviapi-strict: 1` to get a free `400 unknown_param` instead.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "6851"
+                        },
+                        "title": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "Venice: Grand Canal Boat Tour"
+                        },
+                        "description": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "Enjoy a boat tour on the Grand Canal of Venice..."
+                        },
+                        "images": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": [
+                            "https://cdn.getyourguide.com/img/tour/....jpg/53.jpg"
+                          ]
+                        },
+                        "price": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "example": 45
+                        },
+                        "currency": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "EUR"
+                        },
+                        "rating": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "example": 4.176025694659586
+                        },
+                        "review_count": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "example": 1100
+                        },
+                        "reviews": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "author": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "James"
+                              },
+                              "rating": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 5
+                              },
+                              "title": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": null
+                              },
+                              "text": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Our guide was brilliant and answered any questions put to her. Well worth it."
+                              },
+                              "date": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "2026-08-11T05:28:12+02:00"
+                              }
+                            }
+                          }
+                        },
+                        "url": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "The activity page.",
+                          "example": "https://www.getyourguide.com/rome-l33/rome-colosseum-underground-experience-with-roman-forum-t631866/"
+                        },
+                        "meeting_point": {
+                          "type": [
+                            "object",
+                            "null"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": "Arch of Constantine"
+                            },
+                            "address": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": "Piazza del Colosseo, 00184 Roma RM, Italy"
+                            },
+                            "description": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": "Meet your guide at the Arch of Constantine."
+                            },
+                            "latitude": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "example": 41.8898113
+                            },
+                            "longitude": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "example": 12.4906782
+                            }
+                          },
+                          "description": "Where to meet, with coordinates as the page shows them. null when the meeting point depends on the option or the activity picks you up."
+                        },
+                        "meeting_point_note": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "The page note when there is no single meeting point.",
+                          "example": null
+                        },
+                        "pickup_available": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": false
+                        },
+                        "start_points": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Arch of Constantine"
+                              },
+                              "address": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Piazza del Colosseo, 00184 Roma RM, Italy"
+                              },
+                              "description": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Meet your guide at the Arch of Constantine."
+                              },
+                              "latitude": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 41.8898113
+                              },
+                              "longitude": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 12.4906782
+                              }
+                            }
+                          },
+                          "example": [],
+                          "description": "Start locations other than the meeting point (several when it depends on the option)."
+                        },
+                        "end_points": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Arch of Constantine"
+                              },
+                              "address": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Piazza del Colosseo, 00184 Roma RM, Italy"
+                              },
+                              "description": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Meet your guide at the Arch of Constantine."
+                              },
+                              "latitude": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 41.8898113
+                              },
+                              "longitude": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 12.4906782
+                              }
+                            }
+                          },
+                          "example": [],
+                          "description": "A separate end location, when the page marks one."
+                        },
+                        "end_point_note": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Where the activity ends, as the page says it.",
+                          "example": "You'll return to the meeting point at the end of the activity."
+                        },
+                        "attraction": {
+                          "type": [
+                            "object",
+                            "null"
+                          ],
+                          "description": "The main attraction or place the activity is listed under. Coordinates null when the page has none for it.",
+                          "properties": {
+                            "id": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": "2618"
+                            },
+                            "name": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": "Roman Forum"
+                            },
+                            "url": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": null
+                            },
+                            "latitude": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "example": 41.8924623
+                            },
+                            "longitude": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "example": 12.485325
+                            }
+                          }
+                        },
+                        "places_visited": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Arch of Constantine"
+                              },
+                              "address": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Piazza del Colosseo, 00184 Roma RM, Italy"
+                              },
+                              "description": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Meet your guide at the Arch of Constantine."
+                              },
+                              "latitude": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 41.8898113
+                              },
+                              "longitude": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "example": 12.4906782
+                              }
+                            }
+                          },
+                          "example": [
+                            {
+                              "name": "Colosseum",
+                              "address": null,
+                              "description": "Visit, Guided tour 1.5 hours",
+                              "latitude": 41.890209,
+                              "longitude": 12.49288
+                            }
+                          ],
+                          "description": "The stops on the itinerary map."
+                        },
+                        "city": {
+                          "type": [
+                            "object",
+                            "null"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": "33"
+                            },
+                            "name": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": "Rome"
+                            },
+                            "slug": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "description": "The location slug that /activities/{location} and /search take.",
+                              "example": "rome-l33"
+                            }
+                          }
+                        },
+                        "country": {
+                          "type": [
+                            "object",
+                            "null"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": "169011"
+                            },
+                            "name": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "example": "Italy"
+                            }
+                          }
+                        },
+                        "duration": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "2.5 - 3 hours"
+                        },
+                        "duration_minutes": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "description": "Duration in minutes (the shortest, for a range).",
+                          "example": 150
+                        },
+                        "duration_max_minutes": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "description": "The longest duration of a range, in minutes.",
+                          "example": 180
+                        },
+                        "languages": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": [
+                            "English"
+                          ]
+                        },
+                        "language_options": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "example": "Live tour guide"
+                              },
+                              "languages": {
+                                "type": [
+                                  "array",
+                                  "null"
+                                ],
+                                "items": {
+                                  "type": "string"
+                                },
+                                "example": [
+                                  "English"
+                                ]
+                              }
+                            }
+                          },
+                          "example": [
+                            {
+                              "type": "Live tour guide",
+                              "languages": [
+                                "English"
+                              ]
+                            }
+                          ]
+                        },
+                        "free_cancellation": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "example": true
+                        },
+                        "cancellation_policy": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "example": "Cancel up to 7 days in advance for a full refund"
+                        },
+                        "category": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "The activity type the site files it under (guidedTour, dayTrip, transfer, entryTicket, ...). null when it could not be read.",
+                          "example": "guidedTour"
+                        },
+                        "category_ids": {
+                          "type": [
+                            "array",
+                            "null"
+                          ],
+                          "items": {
+                            "type": "integer"
+                          },
+                          "example": [
+                            1,
+                            27,
+                            48
+                          ]
+                        }
+                      }
+                    },
+                    "cached": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ],
+                      "example": false
+                    },
+                    "source": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "example": "getyourguide:activity"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "402": {
+            "$ref": "#/components/responses/CreditLimitReached"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccountSuspended"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/UpstreamFailed"
+          }
+        }
+      }
+    },
     "/activity/{id}": {
       "get": {
         "operationId": "activityById",
@@ -664,6 +1315,12 @@
                 "description": "Seconds until the window starts again.",
                 "schema": {
                   "type": "integer"
+                }
+              },
+              "x-maviapi-unknown-params": {
+                "description": "Query params this endpoint does not take, comma separated; they were ignored. Send `x-maviapi-strict: 1` to get a free `400 unknown_param` instead.",
+                "schema": {
+                  "type": "string"
                 }
               }
             },
@@ -889,6 +1546,12 @@
                 "description": "Seconds until the window starts again.",
                 "schema": {
                   "type": "integer"
+                }
+              },
+              "x-maviapi-unknown-params": {
+                "description": "Query params this endpoint does not take, comma separated; they were ignored. Send `x-maviapi-strict: 1` to get a free `400 unknown_param` instead.",
+                "schema": {
+                  "type": "string"
                 }
               }
             },
@@ -1134,6 +1797,12 @@
                 "description": "Seconds until the window starts again.",
                 "schema": {
                   "type": "integer"
+                }
+              },
+              "x-maviapi-unknown-params": {
+                "description": "Query params this endpoint does not take, comma separated; they were ignored. Send `x-maviapi-strict: 1` to get a free `400 unknown_param` instead.",
+                "schema": {
+                  "type": "string"
                 }
               }
             },
@@ -1507,6 +2176,12 @@
                 "description": "Seconds until the window starts again.",
                 "schema": {
                   "type": "integer"
+                }
+              },
+              "x-maviapi-unknown-params": {
+                "description": "Query params this endpoint does not take, comma separated; they were ignored. Send `x-maviapi-strict: 1` to get a free `400 unknown_param` instead.",
+                "schema": {
+                  "type": "string"
                 }
               }
             },
@@ -1935,6 +2610,12 @@
                 "schema": {
                   "type": "integer"
                 }
+              },
+              "x-maviapi-unknown-params": {
+                "description": "Query params this endpoint does not take, comma separated; they were ignored. Send `x-maviapi-strict: 1` to get a free `400 unknown_param` instead.",
+                "schema": {
+                  "type": "string"
+                }
               }
             },
             "content": {
@@ -2319,6 +3000,12 @@
                 "description": "Seconds until the window starts again.",
                 "schema": {
                   "type": "integer"
+                }
+              },
+              "x-maviapi-unknown-params": {
+                "description": "Query params this endpoint does not take, comma separated; they were ignored. Send `x-maviapi-strict: 1` to get a free `400 unknown_param` instead.",
+                "schema": {
+                  "type": "string"
                 }
               }
             },
@@ -2775,7 +3462,7 @@
     },
     "responses": {
       "BadRequest": {
-        "description": "A parameter is missing or cannot be used.",
+        "description": "A parameter is missing or cannot be used (`bad_request`), or, with the `x-maviapi-strict: 1` request header, a query param the operation does not take was sent (`unknown_param`, with the names in `params`).",
         "content": {
           "application/json": {
             "schema": {
