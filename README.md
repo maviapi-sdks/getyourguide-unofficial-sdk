@@ -152,15 +152,15 @@ Console.WriteLine(result);
 
 | Endpoint | What it returns | Credits per call |
 |---|---|---|
-| [`GET /activities-v2/{location}`](#get-activities-v2location) | Every tour & activity GetYourGuide lists for a location slug (e.g. | 10 |
-| [`GET /activities/{location}`](#get-activitieslocation) | Tour & activity listings for a GetYourGuide location slug (e.g. | 10 |
-| [`GET /activity-v2/{id}`](#get-activity-v2id) | Full detail for one activity by numeric id (e.g. | 10 |
-| [`GET /activity/{id}`](#get-activityid) | Full detail for one activity by numeric id (e.g. | 10 |
-| [`GET /catalog`](#get-catalog) | Enumerate all activity URLs from a GetYourGuide activity sitemap file (?index, ~5000 each); each entry has the activity id and location slug. | 1 |
-| [`GET /explore`](#get-explore) | Resolve a location's tour/activity listings and optionally enrich the top N with full detail (description, images, reviews) in one call. | 10 |
-| [`GET /explore-v2`](#get-explore-v2) | Every tour/activity GetYourGuide lists for a location (all pages, pagination.total = the site's count), optionally with full detail (description, images, reviews) for the top N, in one call. | 10 |
-| [`GET /locations`](#get-locations) | Find GetYourGuide places (cities, regions, countries, attractions) by name: id, name, type, descriptor (e.g. | 10 |
-| [`GET /search`](#get-search) | Search GetYourGuide tours & activities by free text and/or place, with the site's filters (dates, price range, duration, minimum rating, languages, start time, features, categories, departure place) and sort orders. | 10 |
+| [`GET /activities-v2/{location}`](#get-activities-v2location) | Every tour & activity GetYourGuide lists for a place, across all of the site's pages: price, rating, review count, duration, next availability, image. | 5 |
+| [`GET /activities/{location}`](#get-activitieslocation) | Tour & activity listings for a GetYourGuide place in the site's popularity order: the first page of the site's listing (24 rows), each with price, rating, review count, next availability, place label and image. | 5 |
+| [`GET /activity-v2/{id}`](#get-activity-v2id) | Full detail for one activity (as /activity: title, description, images, price, rating, reviews) plus where and how it happens: meeting point with address and coordinates, other start points and a separate end point, pickup, the main attraction (id, name, coordinates, URL) and the places visited with coordinates, the city (id, name, slug) and country, duration with its lower and upper bound in minutes, guide languages and the kind of guide offering them, category and the site's numeric category ids, free cancellation and the cancellation policy, and the activity URL. | 5 |
+| [`GET /activity/{id}`](#get-activityid) | Full detail for one activity: title, description, images, starting price, average rating, review count and a sample of recent reviews (author, rating, title, text, date). | 5 |
+| [`GET /catalog`](#get-catalog) | Activity URLs listed in one GetYourGuide activity sitemap file (about 5000 per file; URLs whose slugs hold characters other than lowercase letters, digits and hyphens are left out), each with its activity id and place slug. | 5 |
+| [`GET /explore`](#get-explore) | A place's tour & activity listings in the site's popularity order (the first page of 24 rows, as /activities), with the top `enrich` listings optionally carrying full detail (description, images, recent reviews) in a `detail` object. | 5 |
+| [`GET /explore-v2`](#get-explore-v2) | Every tour & activity GetYourGuide lists for a place (as /activities-v2: all of the site's pages, `total` = the site's count), with the top `enrich` activities optionally carrying full detail (description, images, recent reviews) in a `detail` object. | 5 |
+| [`GET /locations`](#get-locations) | GetYourGuide places (cities, regions, countries, attractions, neighborhoods) whose name matches the text, in the site's relevance order, at most the site's top 20 suggestions: id, name, type, descriptor such as 'City in Italy', and the place slug (e.g. | 5 |
+| [`GET /search`](#get-search) | One page (24 rows) of GetYourGuide's tour & activity search, by free text and/or place, with the site's filters and sort orders. | 5 |
 
 Try each one in the browser on the [GetYourGuide API page](https://maviapi.com/apis/getyourguide?utm_source=github&utm_medium=readme&utm_campaign=sdk-getyourguide).
 
@@ -178,6 +178,7 @@ A request the API answers with an error status raises an `ApiError` (in Go, retu
 | 401 | `missing_api_key` | No API key was sent, or the key is invalid or revoked (`missing_api_key`, `invalid_api_key`). |
 | 402 | `credit_limit_reached` | The plan's credits for this period are used up. |
 | 403 | `account_banned` | The account that owns the key is suspended. |
+| 410 | `cursor_expired` | The stored copy of the list this cursor walks is gone. Start the list again without cursor. |
 | 429 | `rate_limited` | Too many requests for this key (`rate_limited`), or too many at once for its plan (`concurrency_limited`). Wait the number of seconds in `Retry-After`. |
 | 502 | `scrape_failed` | The source site could not be read this time. Retrying later usually works. |
 
@@ -187,17 +188,20 @@ Base URL: `https://api.maviapi.com/v1/sites/getyourguide`. API version 2026-11-2
 
 ### `GET /activities-v2/{location}`
 
-Every tour & activity GetYourGuide lists for a location slug (e.g. venice-l35), all pages: price, rating, review count, duration, next availability, image. pagination.total matches the site's own count.
+Every tour & activity GetYourGuide lists for a place, across all of the site's pages: price, rating, review count, duration, next availability, image. `total` is the site's own count; rows come in the site's popularity order, then the remaining activities by ascending price.
 
-Each successful request uses 10 credits for every 24 rows it returns (at least 10 credits).
+Each successful request uses 5 credits.
 
 Methods: `activities_v2_by_location` (Python, Ruby) · `activitiesV2ByLocation` (JavaScript/TypeScript, PHP, Java) · `ActivitiesV2ByLocation` (Go) · `ActivitiesV2ByLocationAsync` (C#)
 
 Parameters:
 
-- `location` (string, required, in the path): GetYourGuide place slug in the {city}-l{id} form (from /catalog or an activity URL). Example: `venice-l35`.
-- `limit` (integer, optional): Max activities per page (default 50, max 1000). Every page of the location is fetched once and cached, so any limit/offset is served from the same full list. Example: `50`.
-- `offset` (integer, optional): Activities to skip. Works up to pagination.total (the site's full count), not just the first page. Example: `0`.
+- `location` (string, required, in the path): GetYourGuide place slug in the {city}-l{id} form, e.g. venice-l35 (from /locations, /catalog or an activity URL). Example: `venice-l35`.
+- `limit` (integer, optional): Rows in one page, 1 to 1000 (default 50).
+- `offset` (integer, optional): Rows to skip before the page starts (default 0).
+- `undefined` (string, optional)
+- `undefined` (string, optional)
+- `undefined` (string, optional)
 
 <details>
 <summary>Example response</summary>
@@ -207,40 +211,50 @@ Parameters:
   "data": {
     "location": "venice-l35",
     "location_id": "35",
-    "total": 1152,
+    "total": 1171,
     "complete": true,
-    "count": 50,
+    "count": 1171,
     "activities": [
       {
         "id": "6849",
         "title": "Venice: Marco Polo Airport Water Taxi Transfer",
-        "abstract": "Make your arrival in Venice unforgettable with a water taxi transfer to your hotel or the nearest accessible point from Venice Airport.",
+        "abstract": "Make your arrival in Venice unforgettable with a water taxi transfer to your hotel or the nearest accessible point from Venice Airport. Enjoy a scenic ride and get a stunning first look at Venice.",
         "url": "https://www.getyourguide.com/venice-l35/venice-marco-polo-airport-transfer-shared-water-taxi-t6849/",
         "price": 39,
         "original_price": 39,
         "currency": "EUR",
         "price_label": "per person",
         "rating": 4.37,
-        "rating_count": 29055,
+        "rating_count": 29107,
         "category": "transfer",
-        "duration": "50 minutes",
+        "duration": "50 - 100 minutes",
         "free_cancellation": true,
-        "available_from": "2026-11-14T13:30:00+01:00",
+        "available_from": "2026-11-27T04:00:00+01:00",
         "location": "Venice",
-        "image": "https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=270,height=180,dpr=2/tour_img/1b7db2e061cdbe72.jpeg",
+        "image": "https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=270,height=180,dpr=2/tour_img/1d9ec02a63f56551.jpeg",
         "position": 1
       }
-    ]
+    ],
+    "pagination": {
+      "count": 1171,
+      "has_more": false,
+      "next_cursor": null
+    },
+    "fetched_at": "2026-11-27T17:47:25.675Z",
+    "age": 0
   },
-  "cached": false,
-  "source": "getyourguide:search",
+  "cached": null,
+  "source": null,
   "pagination": {
-    "total": 1152,
-    "limit": 50,
-    "offset": 0,
-    "count": 50,
-    "has_more": true
-  }
+    "total": null,
+    "limit": null,
+    "offset": null,
+    "count": null,
+    "has_more": null,
+    "next_cursor": null
+  },
+  "fetched_at": null,
+  "age": null
 }
 ```
 
@@ -248,17 +262,20 @@ Parameters:
 
 ### `GET /activities/{location}`
 
-Tour & activity listings for a GetYourGuide location slug (e.g. venice-l35), each with price, rating, next availability date and destination.
+Tour & activity listings for a GetYourGuide place in the site's popularity order: the first page of the site's listing (24 rows), each with price, rating, review count, next availability, place label and image.
 
-Each successful request uses 10 credits.
+Each successful request uses 5 credits.
 
 Methods: `activities_by_location` (Python, Ruby) · `activitiesByLocation` (JavaScript/TypeScript, PHP, Java) · `ActivitiesByLocation` (Go) · `ActivitiesByLocationAsync` (C#)
 
 Parameters:
 
-- `location` (string, required, in the path): GetYourGuide place slug in the {city}-l{id} form (from /catalog or an activity URL). Example: `venice-l35`.
-- `limit` (integer, optional): Max items per page (default 50, max 200). Example: `50`.
-- `offset` (integer, optional): Items to skip for pagination. Example: `0`.
+- `location` (string, required, in the path): GetYourGuide place slug in the {city}-l{id} form, e.g. venice-l35 (from /locations, /catalog or an activity URL). Example: `venice-l35`.
+- `limit` (integer, optional): Rows in one page, 1 to 200 (default 50).
+- `offset` (integer, optional): Rows to skip before the page starts (default 0).
+- `undefined` (string, optional)
+- `undefined` (string, optional)
+- `undefined` (string, optional)
 
 <details>
 <summary>Example response</summary>
@@ -267,32 +284,42 @@ Parameters:
 {
   "data": {
     "location": "venice-l35",
-    "count": 16,
+    "count": 24,
     "activities": [
       {
-        "id": "927092",
-        "title": "Venice: St. Mark's Basilica, Doge's Palace & Bridge of Sighs",
-        "url": "https://www.getyourguide.com/venice-l35/venice-st-mark-s-basilica-doge-s-palace-bridge-of-sighs-t927092/",
-        "price": 41.76,
+        "id": "6849",
+        "title": "Venice: Marco Polo Airport Water Taxi Transfer",
+        "url": "https://www.getyourguide.com/venice-l35/venice-marco-polo-airport-transfer-shared-water-taxi-t6849/",
+        "price": 39,
         "currency": "EUR",
-        "rating": 4.0319786,
-        "rating_count": 4122,
-        "available_from": "2026-08-14T09:00:00+02:00",
+        "rating": 4.37,
+        "rating_count": 29107,
+        "available_from": "2026-11-27T04:00:00+01:00",
         "location": "Venice",
-        "image": "https://cdn.getyourguide.com/img/tour/....jpg/68.jpg",
+        "image": "https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=270,height=180,dpr=2/tour_img/1d9ec02a63f56551.jpeg",
         "position": 1
       }
-    ]
+    ],
+    "pagination": {
+      "count": 24,
+      "has_more": false,
+      "next_cursor": null
+    },
+    "fetched_at": "2026-11-27T17:47:07.709Z",
+    "age": 0
   },
-  "cached": false,
-  "source": "https://www.getyourguide.com/venice-l35/",
+  "cached": null,
+  "source": null,
   "pagination": {
-    "total": 16,
-    "limit": 50,
-    "offset": 0,
-    "count": 16,
-    "has_more": false
-  }
+    "total": null,
+    "limit": null,
+    "offset": null,
+    "count": null,
+    "has_more": null,
+    "next_cursor": null
+  },
+  "fetched_at": null,
+  "age": null
 }
 ```
 
@@ -300,15 +327,16 @@ Parameters:
 
 ### `GET /activity-v2/{id}`
 
-Full detail for one activity by numeric id (e.g. 6851), as /activity/{id}, plus where it happens: meeting point (name, address, coordinates), other start and end points, the main attraction and stops with coordinates, city slug and id, duration in minutes, languages, category, free cancellation and the activity url.
+Full detail for one activity (as /activity: title, description, images, price, rating, reviews) plus where and how it happens: meeting point with address and coordinates, other start points and a separate end point, pickup, the main attraction (id, name, coordinates, URL) and the places visited with coordinates, the city (id, name, slug) and country, duration with its lower and upper bound in minutes, guide languages and the kind of guide offering them, category and the site's numeric category ids, free cancellation and the cancellation policy, and the activity URL.
 
-Each successful request uses 10 credits.
+Each successful request uses 5 credits.
 
 Methods: `activity_v2_by_id` (Python, Ruby) · `activityV2ById` (JavaScript/TypeScript, PHP, Java) · `ActivityV2ById` (Go) · `ActivityV2ByIdAsync` (C#)
 
 Parameters:
 
-- `id` (string, required, in the path): Numeric activity id (the …-t<id> in an activity URL). Example: `631866`.
+- `id` (string, required, in the path): numeric activity id, the number after -t in an activity URL (e.g. 631866). Example: `631866`.
+- `undefined` (string, optional)
 
 <details>
 <summary>Example response</summary>
@@ -316,68 +344,56 @@ Parameters:
 ```json
 {
   "data": {
-    "id": "6851",
-    "title": "Venice: Grand Canal Boat Tour",
-    "description": "Enjoy a boat tour on the Grand Canal of Venice...",
+    "id": "631866",
+    "title": "Rome: Colosseum 3-in-1 Tour with Underground Option",
+    "description": "Step onto the Colosseum's Arena Floor—an experience few visitors enjoy, explore ancient temples and tombs in the Roman Forum, and visit Caesar's Palace on Palatine Hill, all with a local expert guide.",
     "images": [
-      null
+      "https://cdn.getyourguide.com/image/fit=crop,width=180,height=180/tour_img/de83673bd7f4f95ff8d7be25c511284d096843c63fb6f69ea5da5ec0e5e15fda.jpg"
     ],
-    "price": 45,
+    "price": 48,
     "currency": "EUR",
-    "rating": 4.176025694659586,
-    "review_count": 1100,
+    "rating": 4.556669946756984,
+    "review_count": 1741,
     "reviews": [
       {
-        "author": "James",
+        "author": "Joy",
         "rating": 5,
         "title": null,
-        "text": "Our guide was brilliant and answered any questions put to her. Well worth it.",
-        "date": "2026-08-11T05:28:12+02:00"
+        "text": "What a memorable day. Loved it. Would do it again and recommend strongly.",
+        "date": "2026-11-27T07:30:59+01:00"
       }
     ],
     "url": "https://www.getyourguide.com/rome-l33/rome-colosseum-underground-experience-with-roman-forum-t631866/",
     "meeting_point": {
       "name": "Arch of Constantine",
       "address": "Piazza del Colosseo, 00184 Roma RM, Italy",
-      "description": "Meet your guide at the Arch of Constantine.",
+      "description": "Meet your guide at the Arch of Constantine, specifically the corner of the arch furthest from the Colosseum. Our meeting point coordinator will be holding a \"Let's See Italy\" sign so they're easy to recognize.",
       "latitude": 41.8898113,
-      "longitude": 12.4906782
+      "longitude": 12.49067819999999
     },
     "meeting_point_note": null,
     "pickup_available": false,
     "start_points": [
-      {
-        "name": "Arch of Constantine",
-        "address": "Piazza del Colosseo, 00184 Roma RM, Italy",
-        "description": "Meet your guide at the Arch of Constantine.",
-        "latitude": 41.8898113,
-        "longitude": 12.4906782
-      }
+      null
     ],
     "end_points": [
-      {
-        "name": "Arch of Constantine",
-        "address": "Piazza del Colosseo, 00184 Roma RM, Italy",
-        "description": "Meet your guide at the Arch of Constantine.",
-        "latitude": 41.8898113,
-        "longitude": 12.4906782
-      }
+      null
     ],
     "end_point_note": "You'll return to the meeting point at the end of the activity.",
     "attraction": {
       "id": "2618",
       "name": "Roman Forum",
-      "url": null,
       "latitude": 41.8924623,
-      "longitude": 12.485325
+      "longitude": 12.485325,
+      "url": "https://www.getyourguide.com/roman-forum-l2618/"
     },
     "places_visited": [
       {
-        "name": "Arch of Constantine",
-        "address": "Piazza del Colosseo, 00184 Roma RM, Italy",
-        "description": "Meet your guide at the Arch of Constantine.",
-        "latitude": 41.8898113,
-        "longitude": 12.4906782
+        "name": "Roman Forum",
+        "description": "Guided tour 45 minutes",
+        "latitude": 41.8924623,
+        "longitude": 12.485325,
+        "main": true
       }
     ],
     "city": {
@@ -393,25 +409,29 @@ Parameters:
     "duration_minutes": 150,
     "duration_max_minutes": 180,
     "languages": [
-      null
+      "English"
     ],
     "language_options": [
       {
         "type": "Live tour guide",
         "languages": [
-          null
+          "English"
         ]
       }
     ],
-    "free_cancellation": true,
-    "cancellation_policy": "Cancel up to 7 days in advance for a full refund",
     "category": "guidedTour",
     "category_ids": [
-      null
-    ]
+      0
+    ],
+    "free_cancellation": true,
+    "cancellation_policy": "Cancel up to 7 days in advance for a full refund",
+    "fetched_at": "2026-11-27T17:47:35.231Z",
+    "age": 0
   },
-  "cached": false,
-  "source": "getyourguide:activity"
+  "cached": null,
+  "source": null,
+  "fetched_at": null,
+  "age": null
 }
 ```
 
@@ -419,15 +439,16 @@ Parameters:
 
 ### `GET /activity/{id}`
 
-Full detail for one activity by numeric id (e.g. 6851): title, description, images, price, rating, review count and sample reviews.
+Full detail for one activity: title, description, images, starting price, average rating, review count and a sample of recent reviews (author, rating, title, text, date).
 
-Each successful request uses 10 credits.
+Each successful request uses 5 credits.
 
 Methods: `activity_by_id` (Python, Ruby) · `activityById` (JavaScript/TypeScript, PHP, Java) · `ActivityById` (Go) · `ActivityByIdAsync` (C#)
 
 Parameters:
 
-- `id` (string, required, in the path): Numeric activity id (the …-t<id> in an activity URL). Example: `6851`.
+- `id` (string, required, in the path): numeric activity id, the number after -t in an activity URL (e.g. 6851). Example: `6851`.
+- `undefined` (string, optional)
 
 <details>
 <summary>Example response</summary>
@@ -437,26 +458,35 @@ Parameters:
   "data": {
     "id": "6851",
     "title": "Venice: Grand Canal Boat Tour",
-    "description": "Enjoy a boat tour on the Grand Canal of Venice...",
+    "description": "Enjoy a boat tour on the Grand Canal of Venice, where you will see the bustling Venetian waterfront and iconic historical landmarks like the luxurious Hotel Gritti, Ca' Pisani Moretta, and the ancient Rialto Bridge.",
     "images": [
-      null
+      "https://cdn.getyourguide.com/img/tour/b73a785a983f8e415467c0186558555d41f52496f68c5878596d9b03eab5b0ab.jpg/53.jpg"
     ],
     "price": 45,
     "currency": "EUR",
-    "rating": 4.176025694659586,
-    "review_count": 1100,
+    "rating": 4.127170705431156,
+    "review_count": 1189,
     "reviews": [
       {
-        "author": "James",
+        "author": "Cinzia",
         "rating": 5,
         "title": null,
-        "text": "Our guide was brilliant and answered any questions put to her. Well worth it.",
-        "date": "2026-08-11T05:28:12+02:00"
+        "text": "A lovely tour; a lot was explained, and you could take great photos!",
+        "date": "2026-10-30T09:18:01+01:00"
       }
-    ]
+    ],
+    "pagination": {
+      "count": 10,
+      "has_more": false,
+      "next_cursor": null
+    },
+    "fetched_at": "2026-11-27T17:47:26.445Z",
+    "age": 0
   },
-  "cached": false,
-  "source": "https://www.getyourguide.com/x-l0/x-t6851/"
+  "cached": null,
+  "source": null,
+  "fetched_at": null,
+  "age": null
 }
 ```
 
@@ -464,17 +494,20 @@ Parameters:
 
 ### `GET /catalog`
 
-Enumerate all activity URLs from a GetYourGuide activity sitemap file (?index, ~5000 each); each entry has the activity id and location slug.
+Activity URLs listed in one GetYourGuide activity sitemap file (about 5000 per file; URLs whose slugs hold characters other than lowercase letters, digits and hyphens are left out), each with its activity id and place slug.
 
-Each successful request uses 1 credit for every 5000 rows it returns (at least 1 credit).
+Each successful request uses 5 credits.
 
 Methods: `catalog` (Python, JavaScript/TypeScript, PHP, Ruby, Java) · `Catalog` (Go) · `CatalogAsync` (C#)
 
 Parameters:
 
-- `index` (integer, optional): Which activity sitemap file to read (0-based). Example: `0`.
-- `limit` (integer, optional): Max items per page (default 100, max 5000). Example: `100`.
-- `offset` (integer, optional): Items to skip for pagination. Example: `0`.
+- `index` (integer, optional): which activity sitemap file to read, 0-based (0 to about 60). Example: `0`.
+- `limit` (integer, optional): Rows in one page, 1 to 1000 (default 100).
+- `offset` (integer, optional): Rows to skip before the page starts (default 0).
+- `undefined` (string, optional)
+- `undefined` (string, optional)
+- `undefined` (string, optional)
 
 <details>
 <summary>Example response</summary>
@@ -483,25 +516,35 @@ Parameters:
 {
   "data": {
     "index": 0,
-    "count": 100,
+    "count": 4998,
     "activities": [
       {
-        "id": "4873",
-        "url": "https://www.getyourguide.com/geneva-l54/best-of-geneva-guided-city-tour-with-scenic-lake-cruise-t4873/",
-        "location": "geneva-l54",
-        "location_id": "54"
+        "id": "462358",
+        "url": "https://www.getyourguide.com/cairo-l92/cairo-giza-pyramids-sphinx-tour-with-camel-ride-entry-t462358/",
+        "location": "cairo-l92",
+        "location_id": "92"
       }
-    ]
+    ],
+    "pagination": {
+      "count": 4998,
+      "has_more": false,
+      "next_cursor": null
+    },
+    "fetched_at": "2026-11-27T17:47:28.995Z",
+    "age": 0
   },
-  "cached": false,
-  "source": "getyourguide:sitemap",
+  "cached": null,
+  "source": null,
   "pagination": {
-    "total": 5000,
-    "limit": 50,
-    "offset": 0,
-    "count": 16,
-    "has_more": false
-  }
+    "total": null,
+    "limit": null,
+    "offset": null,
+    "count": null,
+    "has_more": null,
+    "next_cursor": null
+  },
+  "fetched_at": null,
+  "age": null
 }
 ```
 
@@ -509,19 +552,22 @@ Parameters:
 
 ### `GET /explore`
 
-Resolve a location's tour/activity listings and optionally enrich the top N with full detail (description, images, reviews) in one call.
+A place's tour & activity listings in the site's popularity order (the first page of 24 rows, as /activities), with the top `enrich` listings optionally carrying full detail (description, images, recent reviews) in a `detail` object.
 
-Each successful request uses 10 credits.
+Each successful request uses 5 credits.
 
 Methods: `explore` (Python, JavaScript/TypeScript, PHP, Ruby, Java) · `Explore` (Go) · `ExploreAsync` (C#)
 
 Parameters:
 
-- `location` (string, required): GetYourGuide place slug, e.g. venice-l35. Example: `venice-l35`.
-- `detail` (string, optional): When true, enrich the top `enrich` listings with detail (description, images, reviews). One of: `true`, `false`. Example: `true`.
-- `enrich` (integer, optional): How many top listings to enrich when detail=true (1-5). One of: `1`, `2`, `3`, `4`, `5`. Example: `3`.
-- `limit` (integer, optional): Max items per page (default 50, max 200). Example: `50`.
-- `offset` (integer, optional): Items to skip for pagination. Example: `0`.
+- `location` (string, optional): GetYourGuide place slug, e.g. venice-l35 (from /locations). Example: `venice-l35`.
+- `detail` (string, optional): "true" to add detail to the top listings; "false" for listings only. One of: `true`, `false`. Example: `false`.
+- `enrich` (integer, optional): how many top listings get detail when detail=true (1-5). Example: `3`.
+- `limit` (integer, optional): Rows in one page, 1 to 200 (default 50).
+- `offset` (integer, optional): Rows to skip before the page starts (default 0).
+- `undefined` (string, optional)
+- `undefined` (string, optional)
+- `undefined` (string, optional)
 
 <details>
 <summary>Example response</summary>
@@ -530,48 +576,43 @@ Parameters:
 {
   "data": {
     "location": "venice-l35",
-    "detail": true,
-    "count": 16,
+    "detail": false,
+    "count": 24,
     "activities": [
       {
-        "id": "927092",
-        "title": "Venice: St. Mark's Basilica, Doge's Palace & Bridge of Sighs",
-        "url": "https://www.getyourguide.com/venice-l35/venice-st-mark-s-basilica-doge-s-palace-bridge-of-sighs-t927092/",
-        "price": 41.76,
+        "id": "6849",
+        "title": "Venice: Marco Polo Airport Water Taxi Transfer",
+        "url": "https://www.getyourguide.com/venice-l35/venice-marco-polo-airport-transfer-shared-water-taxi-t6849/",
+        "price": 39,
         "currency": "EUR",
-        "rating": 4.0319786,
-        "rating_count": 4122,
-        "available_from": "2026-08-14T09:00:00+02:00",
+        "rating": 4.37,
+        "rating_count": 29107,
+        "available_from": "2026-11-27T04:00:00+01:00",
         "location": "Venice",
-        "image": "https://cdn.getyourguide.com/img/tour/....jpg/68.jpg",
-        "position": 1,
-        "detail": {
-          "description": null,
-          "images": [
-            null
-          ],
-          "reviews": [
-            {
-              "author": "James",
-              "rating": 5,
-              "title": null,
-              "text": "Our guide was brilliant and answered any questions put to her. Well worth it.",
-              "date": "2026-08-11T05:28:12+02:00"
-            }
-          ]
-        }
+        "image": "https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=270,height=180,dpr=2/tour_img/1d9ec02a63f56551.jpeg",
+        "position": 1
       }
-    ]
+    ],
+    "pagination": {
+      "count": 24,
+      "has_more": false,
+      "next_cursor": null
+    },
+    "fetched_at": "2026-11-27T17:47:29.021Z",
+    "age": 0
   },
-  "cached": false,
-  "source": "getyourguide:combo",
+  "cached": null,
+  "source": null,
   "pagination": {
-    "total": 16,
-    "limit": 50,
-    "offset": 0,
-    "count": 16,
-    "has_more": false
-  }
+    "total": null,
+    "limit": null,
+    "offset": null,
+    "count": null,
+    "has_more": null,
+    "next_cursor": null
+  },
+  "fetched_at": null,
+  "age": null
 }
 ```
 
@@ -579,19 +620,22 @@ Parameters:
 
 ### `GET /explore-v2`
 
-Every tour/activity GetYourGuide lists for a location (all pages, pagination.total = the site's count), optionally with full detail (description, images, reviews) for the top N, in one call.
+Every tour & activity GetYourGuide lists for a place (as /activities-v2: all of the site's pages, `total` = the site's count), with the top `enrich` activities optionally carrying full detail (description, images, recent reviews) in a `detail` object.
 
-Each successful request uses 10 credits for every 24 rows it returns (at least 10 credits).
+Each successful request uses 5 credits.
 
 Methods: `explore_v2` (Python, Ruby) · `exploreV2` (JavaScript/TypeScript, PHP, Java) · `ExploreV2` (Go) · `ExploreV2Async` (C#)
 
 Parameters:
 
-- `location` (string, required): GetYourGuide place slug, e.g. venice-l35. Example: `venice-l35`.
-- `detail` (string, optional): When true, enrich the top `enrich` activities with detail (description, images, reviews). One of: `true`, `false`. Example: `false`.
-- `enrich` (integer, optional): How many top activities to enrich when detail=true (1-5). One of: `1`, `2`, `3`, `4`, `5`. Example: `3`.
-- `limit` (integer, optional): Max activities per page (default 50, max 1000). Every page of the location is fetched once and cached, so any limit/offset is served from the same full list. Example: `50`.
-- `offset` (integer, optional): Activities to skip. Works up to pagination.total (the site's full count), not just the first page. Example: `0`.
+- `location` (string, optional): GetYourGuide place slug, e.g. venice-l35 (from /locations). Example: `venice-l35`.
+- `detail` (string, optional): "true" to add detail to the top activities; "false" for listings only. One of: `true`, `false`. Example: `false`.
+- `enrich` (integer, optional): how many top activities get detail when detail=true (1-5). Example: `3`.
+- `limit` (integer, optional): Rows in one page, 1 to 1000 (default 50).
+- `offset` (integer, optional): Rows to skip before the page starts (default 0).
+- `undefined` (string, optional)
+- `undefined` (string, optional)
+- `undefined` (string, optional)
 
 <details>
 <summary>Example response</summary>
@@ -603,55 +647,50 @@ Parameters:
     "location_id": "35",
     "detail": false,
     "enrich": 0,
-    "total": 1152,
+    "total": 1171,
     "complete": true,
-    "count": 50,
+    "count": 1171,
     "activities": [
       {
         "id": "6849",
         "title": "Venice: Marco Polo Airport Water Taxi Transfer",
-        "abstract": "Make your arrival in Venice unforgettable with a water taxi transfer to your hotel or the nearest accessible point from Venice Airport.",
+        "abstract": "Make your arrival in Venice unforgettable with a water taxi transfer to your hotel or the nearest accessible point from Venice Airport. Enjoy a scenic ride and get a stunning first look at Venice.",
         "url": "https://www.getyourguide.com/venice-l35/venice-marco-polo-airport-transfer-shared-water-taxi-t6849/",
         "price": 39,
         "original_price": 39,
         "currency": "EUR",
         "price_label": "per person",
         "rating": 4.37,
-        "rating_count": 29055,
+        "rating_count": 29107,
         "category": "transfer",
-        "duration": "50 minutes",
+        "duration": "50 - 100 minutes",
         "free_cancellation": true,
-        "available_from": "2026-11-14T13:30:00+01:00",
+        "available_from": "2026-11-27T04:00:00+01:00",
         "location": "Venice",
-        "image": "https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=270,height=180,dpr=2/tour_img/1b7db2e061cdbe72.jpeg",
-        "position": 1,
-        "detail": {
-          "description": "Explore the Grand Canal by boat...",
-          "images": [
-            null
-          ],
-          "reviews": [
-            {
-              "author": "James",
-              "rating": 5,
-              "title": null,
-              "text": "Well worth it.",
-              "date": "2026-08-11T05:28:12+02:00"
-            }
-          ]
-        }
+        "image": "https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=270,height=180,dpr=2/tour_img/1d9ec02a63f56551.jpeg",
+        "position": 1
       }
-    ]
+    ],
+    "pagination": {
+      "count": 1171,
+      "has_more": false,
+      "next_cursor": null
+    },
+    "fetched_at": "2026-11-27T17:47:29.089Z",
+    "age": 0
   },
-  "cached": false,
-  "source": "getyourguide:combo",
+  "cached": null,
+  "source": null,
   "pagination": {
-    "total": 1152,
-    "limit": 50,
-    "offset": 0,
-    "count": 50,
-    "has_more": true
-  }
+    "total": null,
+    "limit": null,
+    "offset": null,
+    "count": null,
+    "has_more": null,
+    "next_cursor": null
+  },
+  "fetched_at": null,
+  "age": null
 }
 ```
 
@@ -659,17 +698,20 @@ Parameters:
 
 ### `GET /locations`
 
-Find GetYourGuide places (cities, regions, countries, attractions) by name: id, name, type, descriptor (e.g. 'City in Italy') and the place slug (e.g. venice-l35) that /activities, /activities-v2, /explore and /search take.
+GetYourGuide places (cities, regions, countries, attractions, neighborhoods) whose name matches the text, in the site's relevance order, at most the site's top 20 suggestions: id, name, type, descriptor such as 'City in Italy', and the place slug (e.g. venice-l35) that the location parameter of the other endpoints takes.
 
-Each successful request uses 10 credits.
+Each successful request uses 5 credits.
 
 Methods: `locations` (Python, JavaScript/TypeScript, PHP, Ruby, Java) · `Locations` (Go) · `LocationsAsync` (C#)
 
 Parameters:
 
-- `q` (string, required): Name of a city, region, country or attraction (any case, accents optional). Example: `venice`.
-- `limit` (integer, optional): Max places to return (the site suggests up to 20). Example: `50`.
-- `offset` (integer, optional): Example: `0`.
+- `q` (string, optional): name of a city, region, country or attraction (any case, accents optional). Example: `venice`.
+- `limit` (integer, optional): Rows in one page, 1 to 200 (default 50).
+- `offset` (integer, optional): Rows to skip before the page starts (default 0).
+- `undefined` (string, optional)
+- `undefined` (string, optional)
+- `undefined` (string, optional)
 
 <details>
 <summary>Example response</summary>
@@ -678,7 +720,7 @@ Parameters:
 {
   "data": {
     "query": "venice",
-    "count": 12,
+    "count": 20,
     "locations": [
       {
         "id": "35",
@@ -689,17 +731,27 @@ Parameters:
         "url": "https://www.getyourguide.com/venice-l35/",
         "image": "https://cdn.getyourguide.com/img/location/5ffeb43d54f6e.jpeg/132.jpg"
       }
-    ]
+    ],
+    "pagination": {
+      "count": 20,
+      "has_more": false,
+      "next_cursor": null
+    },
+    "fetched_at": "2026-11-27T17:47:30.077Z",
+    "age": 0
   },
-  "cached": false,
-  "source": "getyourguide:autocomplete",
+  "cached": null,
+  "source": null,
   "pagination": {
-    "total": 12,
-    "limit": 50,
-    "offset": 0,
-    "count": 12,
-    "has_more": false
-  }
+    "total": null,
+    "limit": null,
+    "offset": null,
+    "count": null,
+    "has_more": null,
+    "next_cursor": null
+  },
+  "fetched_at": null,
+  "age": null
 }
 ```
 
@@ -707,31 +759,34 @@ Parameters:
 
 ### `GET /search`
 
-Search GetYourGuide tours & activities by free text and/or place, with the site's filters (dates, price range, duration, minimum rating, languages, start time, features, categories, departure place) and sort orders. 24 results per page; data.total is the site's own count.
+One page (24 rows) of GetYourGuide's tour & activity search, by free text and/or place, with the site's filters and sort orders. `total` is the site's own count of results for the query; `has_more` says whether page+1 holds more.
 
-Each successful request uses 10 credits for every 24 rows it returns (at least 10 credits).
+Each successful request uses 5 credits.
 
 Methods: `search` (Python, JavaScript/TypeScript, PHP, Ruby, Java) · `Search` (Go) · `SearchAsync` (C#)
 
 Parameters:
 
-- `q` (string, optional): Free text, as typed in the site's search box (an activity, attraction or place). q, location or both are required. Example: `gondola`.
-- `location` (string, optional): Limit to one place: a place slug from /locations (venice-l35) or its numeric id (35). Example: `venice-l35`.
-- `date_from` (string, optional): Only activities available on or after this date (YYYY-MM-DD). Alone, it searches that one day.
-- `date_to` (string, optional): Last day of the date range (YYYY-MM-DD); needs date_from.
-- `min_price` (number, optional): Lowest starting price, in EUR.
-- `max_price` (number, optional): Highest starting price, in EUR.
-- `sort` (string, optional): Order of the results. With q, the text match is weighed in too. One of: `popularity`, `price_asc`, `price_desc`, `rating_desc`. Example: `popularity`.
-- `languages` (string, optional): Guide/audio languages, comma separated ISO codes (en, de, fr, es, it, ...): activities offered in any of them.
-- `duration` (string, optional): Durations, comma separated: 0-3h, 3-5h, 5-7h, full-day, 2-days, 3-days, 4-days, 5-days-plus.
-- `min_rating` (string, optional): Minimum average rating. One of: `3.0`, `3.5`, `4.0`, `4.5`. Example: `3.0`.
-- `start_time` (string, optional): Start times, comma separated: morning (before 12 PM), afternoon (12-5 PM), evening (after 5 PM).
-- `features` (string, optional): Features, comma separated: private, small-group, skip-the-line, wheelchair-accessible, hotel-pickup, originals.
-- `categories` (string, optional): Category ids, comma separated: the tc<n> in a category page address (gondola-tours-tc264 -> tc-264).
-- `departs_from` (string, optional): Departure places, comma separated slugs or ids from /locations.
-- `page` (integer, optional): Page of the site's results, 24 per page (1 to 34; the site serves no pages past about 34). data.total is the full count; narrow the query with filters to reach more rows. Example: `1`.
-- `limit` (integer, optional): Rows of this page to return (default 50: the whole 24-row page). Example: `50`.
-- `offset` (integer, optional): Rows of this page to skip. Example: `0`.
+- `q` (string, optional): free text as typed in the site's search box (an activity, attraction or place). Give q, location or both; with neither, the example search for 'gondola' runs.
+- `location` (string, optional): limit to one place: a place slug from /locations (venice-l35) or its numeric id (35).
+- `date_from` (string, optional): only activities available on or after this date (YYYY-MM-DD); alone, it searches that one day.
+- `date_to` (string, optional): last day of the date range (YYYY-MM-DD); needs date_from.
+- `min_price` (string, optional): lowest starting price, in EUR.
+- `max_price` (string, optional): highest starting price, in EUR.
+- `sort` (string, optional): popularity, price_asc, price_desc or rating_desc; with q the text match is weighed in too. One of: `popularity`, `price_asc`, `price_desc`, `rating_desc`. Example: `popularity`.
+- `languages` (string, optional): guide/audio languages, comma separated ISO codes (en, de, fr, es, it, ...): activities offered in any of them.
+- `duration` (string, optional): durations, comma separated: 0-3h, 3-5h, 5-7h, full-day, 2-days, 3-days, 4-days, 5-days-plus.
+- `min_rating` (string, optional): minimum average rating: 3.0, 3.5, 4.0 or 4.5.
+- `start_time` (string, optional): start times, comma separated: morning (before 12 PM), afternoon (12-5 PM), evening (after 5 PM).
+- `features` (string, optional): comma separated: private, small-group, skip-the-line, wheelchair-accessible, hotel-pickup, originals.
+- `categories` (string, optional): category ids, comma separated: the tc<n> in a category page address (gondola-tours-tc264 -> tc-264 or 264). With several, the rows of each category are merged and total is the sum of their counts.
+- `departs_from` (string, optional): departure places, comma separated place slugs or ids from /locations.
+- `page` (integer, optional): page of the site's results, 24 per page (1 to 34; the site serves no pages past about 34). Narrow the query with filters to reach more rows. Example: `1`.
+- `limit` (integer, optional): Rows in one page, 1 to 200 (default 50).
+- `offset` (integer, optional): Rows to skip before the page starts (default 0).
+- `undefined` (string, optional)
+- `undefined` (string, optional)
+- `undefined` (string, optional)
 
 <details>
 <summary>Example response</summary>
@@ -740,10 +795,7 @@ Parameters:
 {
   "data": {
     "query": "gondola",
-    "location": {
-      "input": "venice-l35",
-      "id": "35"
-    },
+    "location": null,
     "filters": {
       "date_from": null,
       "date_to": null,
@@ -772,40 +824,50 @@ Parameters:
     "sort": "popularity",
     "page": 1,
     "page_size": 24,
-    "total": 288,
+    "total": 1049,
     "has_more": true,
     "count": 24,
     "activities": [
       {
         "id": "221382",
         "title": "Venice: Grand Canal Gondola Ride with App Commentary",
-        "abstract": "Make your arrival in Venice unforgettable with a water taxi transfer to your hotel or the nearest accessible point from Venice Airport.",
-        "url": "https://www.getyourguide.com/venice-l35/venice-marco-polo-airport-transfer-shared-water-taxi-t6849/",
-        "price": 39,
+        "abstract": "Ride a traditional gondola through quiet side canals and along the Grand Canal with in-app audio commentary, and visit the Gondola Gallery with a short virtual-reality film.",
+        "url": "https://www.getyourguide.com/venice-l35/venice-grand-canal-gondola-ride-with-app-commentary-t221382/",
+        "price": 37.05,
         "original_price": 39,
         "currency": "EUR",
         "price_label": "per person",
-        "rating": 4.37,
-        "rating_count": 29055,
-        "category": "transfer",
-        "duration": "50 minutes",
+        "rating": 4.19,
+        "rating_count": 26848,
+        "category": "waterActivity",
+        "duration": "30 minutes - 2 hours",
         "free_cancellation": true,
-        "available_from": "2026-11-14T13:30:00+01:00",
+        "available_from": "2026-11-27T16:00:00+01:00",
         "location": "Venice",
-        "image": "https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=270,height=180,dpr=2/tour_img/1b7db2e061cdbe72.jpeg",
+        "image": "https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=270,height=180,dpr=2/tour_img/db8da9c4a17fa436ebc371b7f64d3a758ed4efb13bdf296d36224719613a15b7.jpg",
         "position": 1
       }
-    ]
+    ],
+    "pagination": {
+      "count": 24,
+      "has_more": true,
+      "next_cursor": "WzEsIjhhZjEzOWI3IixudWxsLDAseyJwYWdlIjoyfV0"
+    },
+    "fetched_at": "2026-11-27T17:47:31.887Z",
+    "age": 0
   },
-  "cached": false,
-  "source": "getyourguide:search",
+  "cached": null,
+  "source": null,
   "pagination": {
-    "total": 24,
-    "limit": 50,
-    "offset": 0,
-    "count": 24,
-    "has_more": false
-  }
+    "total": null,
+    "limit": null,
+    "offset": null,
+    "count": null,
+    "has_more": null,
+    "next_cursor": null
+  },
+  "fetched_at": null,
+  "age": null
 }
 ```
 
@@ -818,7 +880,7 @@ Parameters:
 - [maviapi MCP server](https://maviapi.com/docs#mcp): the same API as tools for Claude, Cursor and other AI agents.
 - [All maviapi APIs](https://maviapi.com/apis?utm_source=github&utm_medium=readme&utm_campaign=sdk-getyourguide). Need a website that is not there? [Ask for it](https://maviapi.com/?utm_source=github&utm_medium=readme&utm_campaign=sdk-getyourguide) and get an API for it.
 
-Other unofficial SDKs: [Airbnb](https://github.com/maviapi-sdks/airbnb-unofficial-sdk) · [Booking.com](https://github.com/maviapi-sdks/booking-unofficial-sdk) · [FlightList](https://github.com/maviapi-sdks/flightlist-unofficial-sdk) · [Google Search](https://github.com/maviapi-sdks/google-search-unofficial-sdk) · [Kiwi.com](https://github.com/maviapi-sdks/kiwi-unofficial-sdk) · [MarineTraffic](https://github.com/maviapi-sdks/marinetraffic-unofficial-sdk) · [Speedtest](https://github.com/maviapi-sdks/speedtest-unofficial-sdk) · [Trainline](https://github.com/maviapi-sdks/trainline-unofficial-sdk) · [Trendyol](https://github.com/maviapi-sdks/trendyol-unofficial-sdk) · [Tripadvisor](https://github.com/maviapi-sdks/tripadvisor-unofficial-sdk) · [Yemeksepeti](https://github.com/maviapi-sdks/yemeksepeti-unofficial-sdk)
+Other unofficial SDKs: [Airbnb](https://github.com/maviapi-sdks/airbnb-unofficial-sdk) · [Booking.com](https://github.com/maviapi-sdks/booking-unofficial-sdk) · [FlightList](https://github.com/maviapi-sdks/flightlist-unofficial-sdk) · [Google Search](https://github.com/maviapi-sdks/google-search-unofficial-sdk) · [Kiwi.com](https://github.com/maviapi-sdks/kiwi-unofficial-sdk) · [Madrid Cultural Agenda](https://github.com/maviapi-sdks/madrid-cultural-agenda-unofficial-sdk) · [MarineTraffic](https://github.com/maviapi-sdks/marinetraffic-unofficial-sdk) · [Speedtest](https://github.com/maviapi-sdks/speedtest-unofficial-sdk) · [Trainline](https://github.com/maviapi-sdks/trainline-unofficial-sdk) · [Trendyol](https://github.com/maviapi-sdks/trendyol-unofficial-sdk) · [Tripadvisor](https://github.com/maviapi-sdks/tripadvisor-unofficial-sdk) · [Yemeksepeti](https://github.com/maviapi-sdks/yemeksepeti-unofficial-sdk)
 
 ## License
 
